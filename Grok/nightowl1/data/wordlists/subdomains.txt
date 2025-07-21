@@ -1,0 +1,9 @@
+# Sample subdomain wordlist
+admin
+api
+dev
+test
+login
+portal
+secure
+dashboard

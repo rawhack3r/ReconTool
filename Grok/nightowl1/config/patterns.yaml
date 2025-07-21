@@ -1,0 +1,13 @@
+secrets:
+  - name: GitHub Token
+    pattern: 'ghp_[0-9a-zA-Z]{36}'
+  - name: Slack Webhook
+    pattern: 'https://hooks.slack.com/services/T[0-9A-Z]+/B[0-9A-Z]+/[0-9a-zA-Z]+'
+  - name: AWS Access Key
+    pattern: '(AKIA|ASIA)[0-9A-Z]{16}'
+  - name: Email
+    pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+  - name: Mobile Number
+    pattern: '\+?[1-9]\d{1,14}'
+  - name: Generic API Key
+    pattern: '[A-Za-z0-9]{20,40}'

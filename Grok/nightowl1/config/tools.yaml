@@ -1,0 +1,117 @@
+
+subfinder:
+  command: "subfinder -d {target} -o {output} -silent -all -v"
+  parser: "parse_subfinder_output"
+  requirements: ["subfinder"]
+assetfinder:
+  command: "assetfinder --subs-only {target} > {output}"
+  parser: "parse_assetfinder_output"
+  requirements: ["assetfinder"]
+findomain:
+  command: "findomain -t {target} --quiet > {output}"
+  parser: "parse_findomain_output"
+  requirements: ["findomain"]
+amass:
+  command: "amass enum -d {target} -o {output} -json -v"
+  parser: "parse_amass_output"
+  requirements: ["amass"]
+sublist3r:
+  command: "sublist3r -d {target} -o {output} -v"
+  parser: "parse_sublist3r_output"
+  requirements: ["sublist3r"]
+gotator:
+  command: "gotator -d {target} -w data/wordlists/subdomains.txt -o {output} -silent"
+  parser: "parse_gotator_output"
+  requirements: ["gotator"]
+puredns:
+  command: "puredns bruteforce data/wordlists/sub %[[REDACTED%]].txt {target} -o {output} -v"
+  parser: "parse_puredns_output"
+  requirements: ["puredns"]
+subdomainfinder:
+  command: "subdomainfinder -d {target} -o {output} -silent"
+  parser: "parse_subdomainfinder_output"
+  requirements: ["subdomainfinder"]
+crt_sh:
+  command: "python3 tools/subdomain_enum/crt_sh_wrapper.py {target} {output}"
+  parser: "parse_crt_sh_output"
+  requirements: ["requests"]
+dnsrecon:
+  command: "dnsrecon -d {target} -t brt -D data/wordlists/subdomains.txt -c {output}"
+  parser: "parse_dnsrecon_output"
+  requirements: ["dnsrecon"]
+certspotter:
+  command: "certspotter -domain {target} > {output}"
+  parser: "parse_certspotter_output"
+  requirements: ["certspotter"]
+dnsgen:
+  command: "dnsgen -w data/wordlists/subdomains.txt - > {output}"
+  parser: "parse_dnsgen_output"
+  requirements: ["dnsgen"]
+trufflehog:
+  command: "trufflehog --no-verification {url} --json > {output}"
+  parser: "parse_trufflehog_output"
+  requirements: ["trufflehog"]
+gitleaks:
+  command: "gitleaks detect --source {url} --report-format json --report-path {output} -v"
+  parser: "parse_gitleaks_output"
+  requirements: ["gitleaks"]
+secretfinder:
+  command: "python3 SecretFinder.py -i {url} -o {output} -e -v"
+  parser: "parse_secretfinder_output"
+  requirements: ["secretfinder"]
+gf:
+  command: "gf emails {url} > {output} && gf passwords {url} >> {output} && gf usernames {url} >> {output}"
+  parser: "parse_gf_output"
+  requirements: ["gf"]
+emailhunter:
+  command: "python3 tools/secret_finding/emailhunter_wrapper.py {target} {output}"
+  parser: "parse_emailhunter_output"
+  requirements: ["emailhunter"]
+theHarvester:
+  command: "theHarvester -d {target} -b all -f {output}"
+  parser: "parse_theharvester_output"
+  requirements: ["theHarvester"]
+katana:
+  command: "katana -u {url} -o {output} -js-crawl -hl -depth 10 -v"
+  parser: "parse_katana_output"
+  requirements: ["katana"]
+ffuf:
+  command: "ffuf -u {url}/FUZZ -w data/wordlists/directories.txt -o {output} -of json -v"
+  parser: "parse_ffuf_output"
+  requirements: ["ffuf"]
+gau:
+  command: "gau {target} -v > {output}"
+  parser: "parse_gau_output"
+  requirements: ["gau"]
+waybackurls:
+  command: "waybackurls {target} > {output}"
+  parser: "parse_waybackurls_output"
+  requirements: ["waybackurls"]
+dnsdumpster:
+  command: "python3 tools/subdomain_enum/dnsdumpster_wrapper.py {target} {output}"
+  parser: "parse_dnsdumpster_output"
+  requirements: ["dnsdumpster"]
+shodan:
+  command: "shodan search --fields ip_str,port,org 'hostname:{target}' --limit 1000 > {output}"
+  parser: "parse_shodan_output"
+  requirements: ["shodan"]
+nuclei:
+  command: "nuclei -u {target} -t templates/nuclei_templates/ -o {output} -json -v"
+  parser: "parse_nuclei_output"
+  requirements: ["nuclei"]
+zap:
+  command: "zap-api-scan.py -t {target} -f json -o {output} -l DEBUG"
+  parser: "parse_zap_output"
+  requirements: ["zap-api-scan.py"]
+metasploit:
+  command: "msfconsole -q -x 'use auxiliary/scanner/http; set RHOSTS {target}; set VERBOSE true; run; exit' > {output}"
+  parser: "parse_metasploit_output"
+  requirements: ["metasploit-framework"]
+cloud-enum:
+  command: "cloud-enum -k {target} -o {output} --threads 10 -v"
+  parser: "parse_cloudenum_output"
+  requirements: ["cloud-enum"]
+httpx:
+  command: "httpx -l {input} -o {output} -silent -status-code -no-color"
+  parser: "parse_httpx_output"
+  requirements: ["httpx"]

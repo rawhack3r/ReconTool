@@ -1,0 +1,8 @@
+# Sample directory wordlist
+admin
+api
+config
+backup
+test
+dev
+login

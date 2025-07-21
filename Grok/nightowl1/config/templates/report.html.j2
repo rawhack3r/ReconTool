@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NightOwl Recon Report for {{ target }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        h1 { color: #2c3e50; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #2c3e50; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .sensitive { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>NightOwl Reconnaissance Report for {{ target }}</h1>
+    <p><strong>Total Time:</strong> {{ total_time }}</p>
+    <p><strong>Subdomains Found:</strong> {{ subdomain_count }}</p>
+    <p><strong>Secrets Found:</strong> {{ secret_count }}</p>
+    <p><strong>Endpoints Found:</strong> {{ endpoint_count }}</p>
+    <p><strong>Vulnerabilities Found:</strong> {{ vuln_count }}</p>
+
+    <h2>Sensitive Domains</h2>
+    <table>
+        <tr><th>Domain</th></tr>
+        {% for domain in sensitive_domains %}
+        <tr><td class="sensitive">{{ domain.subdomain }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Important Paths</h2>
+    <table>
+        <tr><th>Path</th></tr>
+        {% for path in important_paths %}
+        <tr><td>{{ path.endpoint }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Subdomains</h2>
+    <table>
+        <tr><th>Subdomain</th><th>Resolved</th></tr>
+        {% for subdomain in results.subdomains %}
+        <tr><td>{{ subdomain.subdomain }}</td><td>{{ subdomain.resolved }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Secrets</h2>
+    <table>
+        <tr><th>Type</th><th>Value</th><th>Source</th></tr>
+        {% for secret in results.secrets %}
+        <tr><td>{{ secret.type }}</td><td>{{ secret.value }}</td><td>{{ secret.source }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Vulnerabilities</h2>
+    <table>
+        <tr><th>Domain</th><th>Path</th><th>Type</th><th>Severity</th><th>OWASP Category</th></tr>
+        {% for vuln in results.vulnerabilities %}
+        <tr><td>{{ vuln.domain }}</td><td>{{ vuln.path }}</td><td>{{ vuln.type }}</td><td>{{ vuln.severity }}</td><td>{{ vuln.owasp_category }}</td></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

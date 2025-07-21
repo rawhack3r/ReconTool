@@ -1,0 +1,6 @@
+# Sample fuzz parameter wordlist
+id
+token
+key
+user
+pass
