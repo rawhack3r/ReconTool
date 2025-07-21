@@ -1,0 +1,4 @@
+rich
+jinja2
+psutil
+validators
