@@ -1,0 +1,60 @@
+tools:
+  - name: Subfinder
+    command: "subfinder -d {target} -silent"
+    phase: "Subdomain Enumeration"
+    output: "{output_dir}/subfinder.txt"
+    parallel: true
+
+  - name: Amass
+    command: "amass enum -passive -d {target}"
+    phase: "Subdomain Enumeration"
+    output: "{output_dir}/amass.txt"
+    parallel: true
+
+  - name: Assetfinder
+    command: "assetfinder --subs-only {target}"
+    phase: "Subdomain Enumeration"
+    output: "{output_dir}/assetfinder.txt"
+    parallel: true
+
+  - name: OneForAll
+    command: "python3 OneForAll/oneforall.py --target {target} run"
+    phase: "Subdomain Enumeration"
+    output: "{output_dir}/oneforall.txt"
+    parallel: true
+
+  - name: WaybackURLs
+    command: "waybackurls {target}"
+    phase: "Endpoint Discovery"
+    output: "{output_dir}/waybackurls.txt"
+    parallel: false
+
+  - name: Gau
+    command: "gau {target}"
+    phase: "Endpoint Discovery"
+    output: "{output_dir}/gau.txt"
+    parallel: false
+
+  - name: Httpx
+    command: "httpx -l {output_dir}/all_subdomains.txt -silent"
+    phase: "Live Host Probing"
+    output: "{output_dir}/httpx.txt"
+    parallel: false
+
+  - name: Nuclei
+    command: "nuclei -l {output_dir}/httpx.txt -o {output_dir}/nuclei.txt"
+    phase: "Vulnerability Scanning"
+    output: "{output_dir}/nuclei.txt"
+    parallel: false
+
+  - name: SecretsFinder
+    command: "gf secrets {output_dir}/gau.txt"
+    phase: "Secrets Disclosure"
+    output: "{output_dir}/secrets.txt"
+    parallel: false
+
+  - name: Aquatone
+    command: "cat {output_dir}/httpx.txt | aquatone -out {output_dir}/aquatone"
+    phase: "Screenshots"
+    output: "{output_dir}/aquatone/screenshots"
+    parallel: false

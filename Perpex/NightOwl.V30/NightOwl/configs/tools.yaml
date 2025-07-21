@@ -1,0 +1,30 @@
+tools:
+  - name: subfinder
+    command: "subfinder -d {target} -silent"
+    output: "{output_dir}/subdomains/subfinder.txt"
+    parallel: true
+
+  - name: amass
+    command: "amass enum -passive -d {target}"
+    output: "{output_dir}/subdomains/amass.txt"
+    parallel: false
+
+  - name: assetfinder
+    command: "assetfinder --subs-only {target}"
+    output: "{output_dir}/subdomains/assetfinder.txt"
+    parallel: true
+
+  - name: crtsh
+    command: "curl -s https://crt.sh/?q={target}&output=json"
+    output: "{output_dir}/subdomains/crtsh.txt"
+    parallel: false
+
+  - name: nmap
+    command: "nmap -Pn -p- {target} -oN {output_dir}/portscan/nmap.txt"
+    output: "{output_dir}/portscan/nmap.txt"
+    parallel: false
+
+  - name: s3scanner
+    command: "s3scanner {target}"
+    output: "{output_dir}/cloud/s3scanner.txt"
+    parallel: false

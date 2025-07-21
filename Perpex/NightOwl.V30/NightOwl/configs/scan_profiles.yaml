@@ -1,0 +1,19 @@
+profiles:
+  light:
+    phases:
+      - name: subdomain
+        tools: [subfinder]
+
+  deep:
+    phases:
+      - name: subdomain
+        tools: [subfinder, amass, assetfinder]
+      - name: portscan
+        tools: [nmap]
+
+  custom:
+    phases:
+      - name: subdomain
+        tools: [subfinder, amass]
+      - name: cloud
+        tools: [s3scanner]

@@ -1,0 +1,4 @@
+eipl8.com (FQDN) --> ns_record --> ns-1297.awsdns-34.org (FQDN)
+eipl8.com (FQDN) --> ns_record --> ns-1869.awsdns-41.co.uk (FQDN)
+eipl8.com (FQDN) --> ns_record --> ns-528.awsdns-02.net (FQDN)
+eipl8.com (FQDN) --> ns_record --> ns-89.awsdns-11.com (FQDN)

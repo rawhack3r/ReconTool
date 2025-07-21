@@ -1,0 +1,22 @@
+id: owasp-top10-templates
+info:
+  name: OWASP Top 10 Templates
+  author: NightOwl Team
+  severity: medium
+templates:
+  - id: a1-injection
+    info:
+      name: SQL Injection
+      severity: high
+      description: Detects SQL Injection based on parameter fuzzing
+  - id: a2-broken-auth
+    info:
+      name: Broken Authentication
+      severity: high
+      description: Identifies weak authentication flows
+  - id: a3-sensitive-data-exposure
+    info:
+      name: Sensitive Data Exposure
+      severity: medium
+      description: Detects possible leaks of personal or sensitive data
+  # Add more as needed...

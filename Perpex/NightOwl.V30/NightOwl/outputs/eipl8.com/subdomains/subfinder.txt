@@ -1,0 +1,11 @@
+staging.eipl8.com
+m.eipl8.com
+test.eipl8.com
+img.eipl8.com
+ns2.eipl8.com
+pop3.eipl8.com
+forums.eipl8.com
+cpcalendars.eipl8.com
+www.eipl8.com
+dashboard.eipl8.com
+autodiscover.eipl8.com
