@@ -1,0 +1,2 @@
+https://payments-staging.swiggy.com
+https://staging.swiggy.com

@@ -1,0 +1,59 @@
+
+        <html>
+        <head>
+            <title>Screenshot Gallery</title>
+            <style>
+                html,body { background:#111; color:#eee; font-family:sans-serif; margin:0; }
+                #slide-container {
+                    height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+                }
+                img#sshot {
+                    max-width:94vw; max-height:68vh; border:2px solid #333; border-radius:8px;
+                    box-shadow:0 2px 16px #000;
+                }
+                .caption {
+                    font-size:1.7em; margin-bottom:.5em; font-family:monospace; text-align:center;
+                }
+                .nav-btns button {
+                    margin:0 2em; font-size:1em; padding:.5em 2em; background:#234; color:#fff; border:none; border-radius:6px; cursor:pointer;
+                }
+                #counter { margin-top:.7em; color:#aaa; font-size:1.1em; text-align:center; }
+                #missed-list { margin-top:3em; color:#ff6666; }
+                ul { margin:1em 0 0 2em; }
+            </style>
+        </head>
+        <body>
+            <div id="slide-container">
+                <div class="caption" id="caption"></div>
+                <img id="sshot" src="" alt="Screenshot"/>
+                <div id="counter"></div>
+                <div class="nav-btns">
+                    <button onclick="prev()" id="prevbtn">← Prev</button>
+                    <button onclick="next()" id="nextbtn">Next →</button>
+                </div>
+            </div>
+            <script>
+                let i = 0;
+                const slides = [];
+                function show(n) {
+                    i = n;
+                    if(slides.length < 1) return;
+                    document.getElementById('sshot').src = "screenshots/" + slides[i].filename;
+                    document.getElementById('caption').innerText = slides[i].domain;
+                    document.getElementById('counter').innerText = `Slide ${i+1} / ${slides.length}`;
+                    document.getElementById('prevbtn').disabled = (i === 0);
+                    document.getElementById('nextbtn').disabled = (i === slides.length-1);
+                }
+                function next() { if(i<slides.length-1) show(i+1); }
+                function prev() { if(i>0) show(i-1); }
+                document.getElementById('sshot').onclick = next;
+                document.addEventListener('keydown', function(e) {
+                    if(e.key==="ArrowRight") next();
+                    else if(e.key==="ArrowLeft") prev();
+                });
+                window.onload = ()=>{ show(0); };
+            </script>
+            <hr><div id='missed-list'><b>❌ Domains with no screenshot:</b><ul><li>https://click.swiggy.com</li><li>https://cash.swiggy.com</li><li>https://asset-caching.swiggy.com</li><li>https://cbcc-card.swiggy.com</li><li>https://crm-haproxy-v2.swiggy.com</li><li>https://careers.swiggy.com</li><li>https://blog.swiggy.com</li><li>https://careers-demo.swiggy.com</li><li>https://corporate.swiggy.com</li><li>https://assure.swiggy.com</li><li>https://connect.swiggy.com</li><li>https://everything.swiggy.com</li><li>https://dp.swiggy.com</li><li>https://events.swiggy.com</li><li>https://instamart.swiggy.com</li><li>https://marketing.swiggy.com</li><li>https://payments.swiggy.com</li><li>https://labs.swiggy.com</li><li>https://moments.swiggy.com</li><li>https://ipay.swiggy.com</li><li>https://partner.swiggy.com</li><li>https://partner-helpcenter.swiggy.com</li><li>https://momentsatwork.swiggy.com</li><li>https://partner-client.swiggy.com</li><li>https://6.swiggy.com</li><li>https://partner-with-us.swiggy.com</li><li>https://picker.swiggy.com</li><li>https://promos.swiggy.com</li><li>https://partner-client-assets.swiggy.com</li><li>https://roadrunner-cdn.swiggy.com</li><li>https://payments-staging.swiggy.com</li><li>https://rms.swiggy.com</li><li>https://r.swiggy.com</li><li>https://staging.swiggy.com</li><li>https://restaurants.swiggy.com</li><li>https://ride.swiggy.com</li><li>https://www.swiggy.com</li><li>http://super-app.swiggy.com</li><li>http://stores.swiggy.com</li><li>http://rich-media-assets.swiggy.com</li><li>http://swiggy.com</li><li>http://whatthefalooda.swiggy.com</li><li>http://webviews.swiggy.com</li></ul></div>
+        </body>
+        </html>
+        

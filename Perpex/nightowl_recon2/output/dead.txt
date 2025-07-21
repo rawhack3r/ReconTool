@@ -1,0 +1,411 @@
+*.analytics.swiggy.com
+*.app2.swiggy.com
+*.blog.swiggy.com
+*.chkout.swiggy.com
+*.dash.swiggy.com
+*.disc.swiggy.com
+*.h2.swiggy.com
+*.pos.swiggy.com
+*.profile.swiggy.com
+*.restaurants.swiggy.com
+*.rms.swiggy.com
+*.super-app.swiggy.com
+*.swiggy.com
+*.www.swiggy.com
+3p2634ekl3xr.swiggy.com
+48east-group.swiggy.com
+6.swiggy.com [[35ma[0m] [[32m18.164.217.43[0m]
+6.swiggy.com [[35ma[0m] [[32m18.164.217.46[0m]
+6.swiggy.com [[35ma[0m] [[32m18.164.217.51[0m]
+6.swiggy.com [[35ma[0m] [[32m18.164.217.64[0m]
+admin-group.swiggy.com
+ads.swiggy.com
+analytics-uat.swiggy.com
+analytics-uat.swiggy.com [[35ma[0m] [[32m13.229.51.132[0m]
+analytics.swiggy.com
+analytics.swiggy.com [[35ma[0m] [[32m13.250.148.22[0m]
+analytics.swiggy.com [[35ma[0m] [[32m18.143.58.30[0m]
+analytics.swiggy.com [[35ma[0m] [[32m3.0.199.142[0m]
+analytics.swiggy.com [[35ma[0m] [[32m3.1.120.143[0m]
+analytics.swiggy.com [[35ma[0m] [[32m52.74.254.105[0m]
+analytics.swiggy.com [[35ma[0m] [[32m52.77.62.206[0m]
+api-endpoint.swiggy.com
+api-preorder.preorder.swiggy.com
+api.preorder.swiggy.com
+api.swiggy.com
+app-haproxy.swiggy.com
+app-stage.swiggy.com
+app.swiggy.com
+app.swiggy.com [[35ma[0m] [[32m13.228.160.19[0m]
+app.swiggy.com [[35ma[0m] [[32m13.229.19.109[0m]
+app.swiggy.com [[35ma[0m] [[32m13.251.152.178[0m]
+app1.devops-haproxy.swiggy.com
+app2.swiggy.com
+app3-haproxy.swiggy.com
+app4.devops-haproxy.swiggy.com
+asset-caching.swiggy.com [[35ma[0m] [[32m54.192.142.21[0m]
+asset-caching.swiggy.com [[35ma[0m] [[32m54.192.142.58[0m]
+asset-caching.swiggy.com [[35ma[0m] [[32m54.192.142.61[0m]
+asset-caching.swiggy.com [[35ma[0m] [[32m54.192.142.90[0m]
+assets.swiggy.com
+assets.swiggy.com [[35ma[0m] [[32m18.164.246.115[0m]
+assets.swiggy.com [[35ma[0m] [[32m18.164.246.122[0m]
+assets.swiggy.com [[35ma[0m] [[32m18.164.246.27[0m]
+assets.swiggy.com [[35ma[0m] [[32m18.164.246.53[0m]
+assure-media-assets.swiggy.com
+awsvpn.swiggy.com
+backend-haproxy.swiggy.com
+bifrost.swiggy.com
+birthdaybash.swiggy.com
+blog.swiggy.com [[35ma[0m] [[32m162.159.135.42[0m]
+blognew.swiggy.com
+bytes.swiggy.com
+bytes.swiggy.com [[35ma[0m] [[32m52.0.16.118[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.1.119.170[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.1.147.205[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.1.173.203[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.4.145.119[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.4.175.111[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.4.225.124[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.4.240.221[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.4.38.70[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.5.181.79[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.6.3.192[0m]
+bytes.swiggy.com [[35ma[0m] [[32m52.6.46.142[0m]
+careers-demo.swiggy.com [[35ma[0m] [[32m18.164.188.119[0m]
+careers-demo.swiggy.com [[35ma[0m] [[32m18.164.188.127[0m]
+careers-demo.swiggy.com [[35ma[0m] [[32m18.164.188.71[0m]
+careers-demo.swiggy.com [[35ma[0m] [[32m18.164.188.76[0m]
+careers.swiggy.com [[35ma[0m] [[32m108.158.245.22[0m]
+careers.swiggy.com [[35ma[0m] [[32m108.158.245.47[0m]
+careers.swiggy.com [[35ma[0m] [[32m108.158.245.66[0m]
+careers.swiggy.com [[35ma[0m] [[32m108.158.245.95[0m]
+cbcc-card.swiggy.com [[35ma[0m] [[32m13.203.125.58[0m]
+cbcc-card.swiggy.com [[35ma[0m] [[32m13.233.175.166[0m]
+cbcc-card.swiggy.com [[35ma[0m] [[32m3.109.243.18[0m]
+cbcc-external.swiggy.com
+cbcc-external.swiggy.com [[35ma[0m] [[32m18.138.139.249[0m]
+cbcc-external.swiggy.com [[35ma[0m] [[32m18.138.95.30[0m]
+cbcc-external.swiggy.com [[35ma[0m] [[32m52.76.152.132[0m]
+cbcc.swiggy.com
+cbcc.swiggy.com [[35ma[0m] [[32m13.229.166.71[0m]
+cbcc.swiggy.com [[35ma[0m] [[32m52.220.91.229[0m]
+cbcc.swiggy.com [[35ma[0m] [[32m52.76.13.107[0m]
+chkout.swiggy.com
+chkout.swiggy.com [[35ma[0m] [[32m54.192.142.61[0m]
+chkout.swiggy.com [[35ma[0m] [[32m54.192.142.62[0m]
+chkout.swiggy.com [[35ma[0m] [[32m54.192.142.7[0m]
+chkout.swiggy.com [[35ma[0m] [[32m54.192.142.82[0m]
+click.swiggy.com [[35ma[0m] [[32m162.159.140.159[0m]
+click.swiggy.com [[35ma[0m] [[32m172.66.0.157[0m]
+clientmetrics.swiggy.com
+cms-endpoint.swiggy.com
+cms-haproxy.swiggy.com
+cms-haproxy.swiggy.com [[35ma[0m] [[32m18.141.173.223[0m]
+cms-haproxy.swiggy.com [[35ma[0m] [[32m54.179.89.202[0m]
+cms.swiggy.com
+commengine-es-monitor.swiggy.com
+commengine-log.swiggy.com
+competitive-intelligence-haproxy-01.swiggy.com
+connect.swiggy.com [[35ma[0m] [[32m13.228.118.168[0m]
+connect.swiggy.com [[35ma[0m] [[32m175.41.173.165[0m]
+connect.swiggy.com [[35ma[0m] [[32m18.138.0.91[0m]
+corporate.swiggy.com [[35ma[0m] [[32m18.138.17.111[0m]
+corporate.swiggy.com [[35ma[0m] [[32m52.220.22.240[0m]
+corporate.swiggy.com [[35ma[0m] [[32m52.77.152.19[0m]
+crm-haproxy-v2.swiggy.com [[35ma[0m] [[32m18.136.206.40[0m]
+daily.swiggy.com
+dash.swiggy.com
+dash.swiggy.com [[35ma[0m] [[32m13.225.103.102[0m]
+dash.swiggy.com [[35ma[0m] [[32m13.225.103.116[0m]
+dash.swiggy.com [[35ma[0m] [[32m13.225.103.3[0m]
+dash.swiggy.com [[35ma[0m] [[32m13.225.103.89[0m]
+de-endpoint.swiggy.com
+de-haproxy.swiggy.com
+delivery-websocket-haproxy.swiggy.com
+dineout-media-assets.swiggy.com
+dineout-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.106[0m]
+dineout-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.126[0m]
+dineout-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.32[0m]
+dineout-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.46[0m]
+dinersone-proxy.swiggy.com
+dinersone-proxy.swiggy.com [[35ma[0m] [[32m18.164.202.100[0m]
+dinersone-proxy.swiggy.com [[35ma[0m] [[32m18.164.202.22[0m]
+dinersone-proxy.swiggy.com [[35ma[0m] [[32m18.164.202.27[0m]
+dinersone-proxy.swiggy.com [[35ma[0m] [[32m18.164.202.28[0m]
+disc-akamai-2.swiggy.com
+disc-akamai-2.swiggy.com [[35ma[0m] [[32m18.141.117.215[0m]
+disc-akamai-2.swiggy.com [[35ma[0m] [[32m3.1.91.170[0m]
+disc-akamai-2.swiggy.com [[35ma[0m] [[32m52.74.28.31[0m]
+disc-akamai-3.swiggy.com
+disc-akamai.swiggy.com
+disc-akamai.swiggy.com [[35ma[0m] [[32m18.141.117.215[0m]
+disc-akamai.swiggy.com [[35ma[0m] [[32m3.1.91.170[0m]
+disc-akamai.swiggy.com [[35ma[0m] [[32m52.74.28.31[0m]
+disc.swiggy.com
+disc.swiggy.com [[35ma[0m] [[32m108.159.46.124[0m]
+disc.swiggy.com [[35ma[0m] [[32m108.159.46.23[0m]
+disc.swiggy.com [[35ma[0m] [[32m108.159.46.4[0m]
+disc.swiggy.com [[35ma[0m] [[32m108.159.46.71[0m]
+dp.swiggy.com [[35ma[0m] [[32m162.159.140.159[0m]
+dp.swiggy.com [[35ma[0m] [[32m172.66.0.157[0m]
+driver-media-assets.swiggy.com
+driver-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.12[0m]
+driver-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.32[0m]
+driver-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.53[0m]
+driver-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.84[0m]
+email.swiggy.com
+ethics.swiggy.com
+events.swiggy.com [[35ma[0m] [[32m13.250.214.203[0m]
+events.swiggy.com [[35ma[0m] [[32m18.136.161.154[0m]
+events.swiggy.com [[35ma[0m] [[32m18.141.254.218[0m]
+finance-cash-service.swiggy.com
+finance-haproxy.swiggy.com
+fm.swiggy.com
+fna.swiggy.com
+fna.swiggy.com [[35ma[0m] [[32m13.213.100.63[0m]
+fna.swiggy.com [[35ma[0m] [[32m52.76.132.217[0m]
+fna.swiggy.com [[35ma[0m] [[32m54.169.33.155[0m]
+food-media-assets.swiggy.com
+food-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.113[0m]
+food-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.66[0m]
+food-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.84[0m]
+food-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.97[0m]
+foodios-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.12[0m]
+foodios-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.32[0m]
+foodios-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.53[0m]
+foodios-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.84[0m]
+foodxp-media-assets.swiggy.com
+foodxp-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.12[0m]
+foodxp-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.32[0m]
+foodxp-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.53[0m]
+foodxp-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.84[0m]
+genie-media-assets.swiggy.com
+genie-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.12[0m]
+genie-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.32[0m]
+genie-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.53[0m]
+genie-media-assets.swiggy.com [[35ma[0m] [[32m13.33.88.84[0m]
+go.swiggy.com
+graylog-es-monitor.swiggy.com
+graylog.swiggy.com
+group.swiggy.com
+h2.swiggy.com
+hackathon.swiggy.com
+haleem.swiggy.com
+handpicked.swiggy.com
+handpicked.swiggy.com [[35ma[0m] [[32m18.164.202.10[0m]
+handpicked.swiggy.com [[35ma[0m] [[32m18.164.202.126[0m]
+handpicked.swiggy.com [[35ma[0m] [[32m18.164.202.33[0m]
+handpicked.swiggy.com [[35ma[0m] [[32m18.164.202.50[0m]
+haproxy-kibana.swiggy.com
+hyperlink.swiggy.com
+hyperlink.swiggy.com [[35ma[0m] [[32m52.52.148.123[0m]
+hyperlink.swiggy.com [[35ma[0m] [[32m54.176.135.143[0m]
+img.swiggy.com
+inc-portal.swiggy.com
+insanelygood-media-assets.swiggy.com
+insanelygood-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.113[0m]
+insanelygood-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.66[0m]
+insanelygood-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.84[0m]
+insanelygood-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.97[0m]
+insightsvi.swiggy.com
+instamart-media-assets.swiggy.com
+instamart-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.106[0m]
+instamart-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.126[0m]
+instamart-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.32[0m]
+instamart-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.46[0m]
+instamart.swiggy.com [[35ma[0m] [[32m99.86.30.32[0m]
+instamart.swiggy.com [[35ma[0m] [[32m99.86.30.42[0m]
+instamart.swiggy.com [[35ma[0m] [[32m99.86.30.68[0m]
+instamart.swiggy.com [[35ma[0m] [[32m99.86.30.88[0m]
+instamax-media-assets.swiggy.com
+instamax-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.113[0m]
+instamax-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.66[0m]
+instamax-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.84[0m]
+instamax-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.97[0m]
+instamax.swiggy.com
+integration.swiggy.com
+inventory.swiggy.com
+jira.swiggy.com
+kiosk.swiggy.com
+launchpad.swiggy.com
+learn.swiggy.com
+learn.swiggy.com [[35ma[0m] [[32m52.221.3.86[0m]
+makemesuper.swiggy.com
+maps.swiggy.com
+maps.swiggy.com [[35ma[0m] [[32m54.192.142.128[0m]
+maps.swiggy.com [[35ma[0m] [[32m54.192.142.34[0m]
+maps.swiggy.com [[35ma[0m] [[32m54.192.142.39[0m]
+maps.swiggy.com [[35ma[0m] [[32m54.192.142.76[0m]
+marketing-endpoint.swiggy.com
+marketing-media-assets.swiggy.com
+marketing-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.106[0m]
+marketing-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.126[0m]
+marketing-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.32[0m]
+marketing-media-assets.swiggy.com [[35ma[0m] [[32m99.86.30.46[0m]
+matchdaymania.swiggy.com
+media-assets.swiggy.com
+media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.113[0m]
+media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.66[0m]
+media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.84[0m]
+media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.97[0m]
+minis-media-assets.swiggy.com
+minis-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.113[0m]
+minis-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.66[0m]
+minis-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.84[0m]
+minis-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.97[0m]
+moments.swiggy.com [[35ma[0m] [[32m13.250.69.100[0m]
+moments.swiggy.com [[35ma[0m] [[32m3.0.226.148[0m]
+moments.swiggy.com [[35ma[0m] [[32m3.1.162.198[0m]
+myvalendine.swiggy.com
+oneview.swiggy.com
+oneview.swiggy.com [[35ma[0m] [[32m13.228.4.227[0m]
+oneview.swiggy.com [[35ma[0m] [[32m18.140.131.95[0m]
+oneview.swiggy.com [[35ma[0m] [[32m52.76.91.123[0m]
+ops.swiggy.com
+origin-www.swiggy.com
+panela.swiggy.com
+partner-client.swiggy.com [[35ma[0m] [[32m3.170.229.105[0m]
+partner-client.swiggy.com [[35ma[0m] [[32m3.170.229.42[0m]
+partner-client.swiggy.com [[35ma[0m] [[32m3.170.229.55[0m]
+partner-client.swiggy.com [[35ma[0m] [[32m3.170.229.94[0m]
+partner-helpcenter.swiggy.com [[35ma[0m] [[32m13.35.37.111[0m]
+partner-helpcenter.swiggy.com [[35ma[0m] [[32m13.35.37.123[0m]
+partner-helpcenter.swiggy.com [[35ma[0m] [[32m13.35.37.34[0m]
+partner-helpcenter.swiggy.com [[35ma[0m] [[32m13.35.37.91[0m]
+partner-uat1.swiggy.com
+partner-with-us.swiggy.com [[35ma[0m] [[32m18.138.17.111[0m]
+partner-with-us.swiggy.com [[35ma[0m] [[32m52.220.22.240[0m]
+partner-with-us.swiggy.com [[35ma[0m] [[32m52.77.152.19[0m]
+partner.swiggy.com [[35ma[0m] [[32m54.192.142.18[0m]
+partner.swiggy.com [[35ma[0m] [[32m54.192.142.56[0m]
+partner.swiggy.com [[35ma[0m] [[32m54.192.142.58[0m]
+partner.swiggy.com [[35ma[0m] [[32m54.192.142.95[0m]
+payments-staging.swiggy.com [[35ma[0m] [[32m18.164.217.38[0m]
+payments-staging.swiggy.com [[35ma[0m] [[32m18.164.217.84[0m]
+payments-staging.swiggy.com [[35ma[0m] [[32m18.164.217.87[0m]
+payments-staging.swiggy.com [[35ma[0m] [[32m18.164.217.93[0m]
+payments.swiggy.com [[35ma[0m] [[32m3.165.75.50[0m]
+payments.swiggy.com [[35ma[0m] [[32m3.165.75.60[0m]
+payments.swiggy.com [[35ma[0m] [[32m3.165.75.78[0m]
+payments.swiggy.com [[35ma[0m] [[32m3.165.75.84[0m]
+picker.swiggy.com [[35ma[0m] [[32m13.33.45.103[0m]
+picker.swiggy.com [[35ma[0m] [[32m13.33.45.116[0m]
+picker.swiggy.com [[35ma[0m] [[32m13.33.45.67[0m]
+picker.swiggy.com [[35ma[0m] [[32m13.33.45.80[0m]
+portal-endpoint.swiggy.com
+portal-haproxy-05.swiggy.com
+portal-haproxy.swiggy.com
+portal-uat.swiggy.com
+pos.swiggy.com
+pos.swiggy.com [[35ma[0m] [[32m18.66.63.120[0m]
+pos.swiggy.com [[35ma[0m] [[32m18.66.63.25[0m]
+pos.swiggy.com [[35ma[0m] [[32m18.66.63.82[0m]
+pos.swiggy.com [[35ma[0m] [[32m18.66.63.87[0m]
+preorder.preorder.swiggy.com
+preorder.swiggy.com
+profile.swiggy.com
+profile.swiggy.com [[35ma[0m] [[32m13.35.37.10[0m]
+profile.swiggy.com [[35ma[0m] [[32m13.35.37.117[0m]
+profile.swiggy.com [[35ma[0m] [[32m13.35.37.22[0m]
+profile.swiggy.com [[35ma[0m] [[32m13.35.37.81[0m]
+promos.swiggy.com [[35ma[0m] [[32m108.158.245.15[0m]
+promos.swiggy.com [[35ma[0m] [[32m108.158.245.17[0m]
+promos.swiggy.com [[35ma[0m] [[32m108.158.245.29[0m]
+promos.swiggy.com [[35ma[0m] [[32m108.158.245.73[0m]
+pyng-media-assets.swiggy.com
+r.swiggy.com [[35ma[0m] [[32m18.142.67.118[0m]
+r.swiggy.com [[35ma[0m] [[32m3.1.165.103[0m]
+r.swiggy.com [[35ma[0m] [[32m47.129.16.85[0m]
+redirects-haproxy.swiggy.com
+redirects-haproxy.swiggy.com [[35ma[0m] [[32m13.250.112.240[0m]
+redirects-haproxy.swiggy.com [[35ma[0m] [[32m18.136.204.117[0m]
+remote.swiggy.com
+restaurants.swiggy.com [[35ma[0m] [[32m18.138.17.111[0m]
+restaurants.swiggy.com [[35ma[0m] [[32m52.220.22.240[0m]
+restaurants.swiggy.com [[35ma[0m] [[32m52.77.152.19[0m]
+rich-media-assets.swiggy.com [[35ma[0m] [[32m151.101.130.92[0m]
+rich-media-assets.swiggy.com [[35ma[0m] [[32m151.101.194.92[0m]
+rich-media-assets.swiggy.com [[35ma[0m] [[32m151.101.2.92[0m]
+rich-media-assets.swiggy.com [[35ma[0m] [[32m151.101.66.92[0m]
+ride.swiggy.com [[35ma[0m] [[32m13.229.172.187[0m]
+ride.swiggy.com [[35ma[0m] [[32m13.251.227.229[0m]
+ride.swiggy.com [[35ma[0m] [[32m52.74.164.2[0m]
+rms.swiggy.com [[35ma[0m] [[32m108.157.254.104[0m]
+rms.swiggy.com [[35ma[0m] [[32m108.157.254.13[0m]
+rms.swiggy.com [[35ma[0m] [[32m108.157.254.87[0m]
+rms.swiggy.com [[35ma[0m] [[32m108.157.254.93[0m]
+roadrunner-cdn.swiggy.com [[35ma[0m] [[32m108.158.232.59[0m]
+roadrunner-cdn.swiggy.com [[35ma[0m] [[32m108.158.232.6[0m]
+roadrunner-cdn.swiggy.com [[35ma[0m] [[32m108.158.232.60[0m]
+roadrunner-cdn.swiggy.com [[35ma[0m] [[32m108.158.232.77[0m]
+sales.swiggy.com
+sandbox.cloud-menu.api.swiggy.com
+sanemobileuat.swiggy.com
+sit.swiggy.com
+spns.swiggy.com
+spns.swiggy.com [[35ma[0m] [[32m13.33.88.5[0m]
+spns.swiggy.com [[35ma[0m] [[32m13.33.88.67[0m]
+spns.swiggy.com [[35ma[0m] [[32m13.33.88.87[0m]
+spns.swiggy.com [[35ma[0m] [[32m13.33.88.88[0m]
+stores-staging.swiggy.com
+stores.swiggy.com [[35ma[0m] [[32m3.170.229.59[0m]
+stores.swiggy.com [[35ma[0m] [[32m3.170.229.90[0m]
+stores.swiggy.com [[35ma[0m] [[32m3.170.229.96[0m]
+stores.swiggy.com [[35ma[0m] [[32m3.170.229.99[0m]
+stubs.swiggy.com
+super-app-haproxy.swiggy.com
+super-app.swiggy.com [[35ma[0m] [[32m13.227.249.116[0m]
+super-app.swiggy.com [[35ma[0m] [[32m13.227.249.118[0m]
+super-app.swiggy.com [[35ma[0m] [[32m13.227.249.3[0m]
+super-app.swiggy.com [[35ma[0m] [[32m13.227.249.67[0m]
+swiggy.com [[35ma[0m] [[32m18.138.17.111[0m]
+swiggy.com [[35ma[0m] [[32m52.220.22.240[0m]
+swiggy.com [[35ma[0m] [[32m52.77.152.19[0m]
+swiggyagent.swiggy.com
+telephony-haproxy.swiggy.com
+tracking-communication.swiggy.com
+uat.swiggy.com
+vas-portal.swiggy.com
+vas-portal.swiggy.com [[35ma[0m] [[32m18.164.217.115[0m]
+vas-portal.swiggy.com [[35ma[0m] [[32m18.164.217.122[0m]
+vas-portal.swiggy.com [[35ma[0m] [[32m18.164.217.57[0m]
+vas-portal.swiggy.com [[35ma[0m] [[32m18.164.217.63[0m]
+vendor-endpoint.swiggy.com
+vendor-h2.swiggy.com
+vendor-haproxy.swiggy.com
+vendor-integration-endpoint.swiggy.com
+vendor-media-assets.swiggy.com
+vendor-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.113[0m]
+vendor-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.66[0m]
+vendor-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.84[0m]
+vendor-media-assets.swiggy.com [[35ma[0m] [[32m108.158.245.97[0m]
+vendor.swiggy.com
+vendor.swiggy.com [[35ma[0m] [[32m108.159.28.122[0m]
+vendor.swiggy.com [[35ma[0m] [[32m108.159.28.128[0m]
+vendor.swiggy.com [[35ma[0m] [[32m108.159.28.37[0m]
+vendor.swiggy.com [[35ma[0m] [[32m108.159.28.45[0m]
+webviews.swiggy.com [[35ma[0m] [[32m108.158.232.129[0m]
+webviews.swiggy.com [[35ma[0m] [[32m108.158.232.21[0m]
+webviews.swiggy.com [[35ma[0m] [[32m108.158.232.23[0m]
+webviews.swiggy.com [[35ma[0m] [[32m108.158.232.35[0m]
+whatthefalooda.swiggy.com [[35ma[0m] [[32m18.164.217.127[0m]
+whatthefalooda.swiggy.com [[35ma[0m] [[32m18.164.217.61[0m]
+whatthefalooda.swiggy.com [[35ma[0m] [[32m18.164.217.85[0m]
+whatthefalooda.swiggy.com [[35ma[0m] [[32m18.164.217.86[0m]
+workbench.swiggy.com
+ws.swiggy.com
+www.blog.swiggy.com
+www.blognew.swiggy.com
+www.bytes.swiggy.com
+www.cbcc-external.swiggy.com
+www.finance-cash-service.swiggy.com
+www.group.swiggy.com
+www.matchdaymania.swiggy.com
+www.partner-with-us.swiggy.com
+www.swiggy.com [[35ma[0m] [[32m54.192.142.100[0m]
+www.swiggy.com [[35ma[0m] [[32m54.192.142.30[0m]
+www.swiggy.com [[35ma[0m] [[32m54.192.142.37[0m]
+www.swiggy.com [[35ma[0m] [[32m54.192.142.83[0m]
+www.xl.swiggy.com
+xl.swiggy.com
