@@ -1,0 +1,5 @@
+{
+  "admin_panel": "/admin",
+  "login_page": "/login",
+  "api_endpoint": "/api"
+}

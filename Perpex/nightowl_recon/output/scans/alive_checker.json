@@ -1,0 +1,14 @@
+[
+  {
+    "domain": "goldsbetvip9.com",
+    "protocol": "http",
+    "status": "alive",
+    "status_code": 200
+  },
+  {
+    "domain": "goldsbetvip9.com",
+    "protocol": "https",
+    "status": "alive",
+    "status_code": 200
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "scan_modes": {
+    "light": {
+      "tools": ["subfinder", "crtsh", "email_extractor", "alive_checker"]
+    },
+    "deep": {
+      "tools": ["amass", "sublist3r", "assetfinder"]
+    }
+  }
+}

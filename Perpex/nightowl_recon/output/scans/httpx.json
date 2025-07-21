@@ -1,0 +1,44 @@
+[
+  {
+    "timestamp": "2025-07-19T02:11:04.399998172+05:30",
+    "port": "443",
+    "url": "https://goldsbetvip9.com",
+    "input": "goldsbetvip9.com",
+    "title": "GoldsBet - Leading Sports Betting site & Online Casino",
+    "scheme": "https",
+    "webserver": "cloudflare",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "2606:4700:4400::ac40:9608",
+    "path": "/",
+    "time": "383.047982ms",
+    "a": [
+      "172.64.150.8",
+      "104.18.37.248"
+    ],
+    "aaaa": [
+      "2606:4700:4400::ac40:9608",
+      "2606:4700:4400::6812:25f8"
+    ],
+    "tech": [
+      "Alibaba Cloud Object Storage Service",
+      "Cloudflare",
+      "Cloudflare Bot Management",
+      "HSTS",
+      "HTTP/3"
+    ],
+    "words": 3759,
+    "lines": 1,
+    "status_code": 200,
+    "content_length": 115587,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "1.1.1.1:53",
+      "1.0.0.1:53"
+    ]
+  }
+]

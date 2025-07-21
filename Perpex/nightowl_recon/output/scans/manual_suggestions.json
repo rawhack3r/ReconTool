@@ -1,0 +1,11 @@
+[
+  {
+    "suggestion": "Review /important/ for juicy paths and secrets"
+  },
+  {
+    "suggestion": "Check /vulnerabilities for critical alerts and verify manually"
+  },
+  {
+    "suggestion": "Login as test/test if possible"
+  }
+]

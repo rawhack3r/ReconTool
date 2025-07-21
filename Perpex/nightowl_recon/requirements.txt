@@ -1,0 +1,92 @@
+# Core dependencies
+aiohttp>=3.8.5
+asyncio-throttle>=1.0.2
+rich>=13.5.2
+click>=8.1.7
+pydantic>=2.3.0
+python-dateutil>=2.8.2
+psutil>=5.9.5
+requests>=2.31.0
+urllib3>=2.0.4
+beautifulsoup4>=4.12.2
+lxml>=4.9.3
+Pillow>=10.0.0
+
+# Network and DNS
+dnspython>=2.4.2
+netaddr>=0.9.0
+python-nmap>=0.7.1
+
+# Data processing
+pandas>=2.0.3
+numpy>=1.24.4
+openpyxl>=3.1.2
+python-docx>=0.8.11
+
+# Database
+SQLAlchemy>=2.0.19
+alembic>=1.11.3
+
+# Security and crypto
+cryptography>=41.0.3
+pycryptodome>=3.18.0
+bcrypt>=4.0.1
+PyJWT>=2.8.0
+
+# Web scraping
+selenium>=4.11.2
+webdriver-manager>=4.0.0
+scrapy>=2.10.0
+
+# API clients
+shodan>=1.29.1
+# python-virustotal>=1.0.2
+
+# File handling
+python-magic>=0.4.27
+zipfile36>=0.1.3
+
+# Logging and monitoring
+loguru>=0.7.0
+prometheus-client>=0.17.1
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.1
+pytest-mock>=3.11.1
+coverage>=7.3.0
+
+# Development
+black>=23.7.0
+flake8>=6.0.0
+mypy>=1.5.1
+pre-commit>=3.3.3
+bandit>=1.7.5
+isort>=5.12.0
+
+# Documentation
+sphinx>=7.1.2
+sphinx-rtd-theme>=1.3.0
+mkdocs>=1.5.2
+mkdocs-material>=9.1.21
+
+# Optional ML dependencies
+scikit-learn>=1.3.0
+tensorflow>=2.13.0
+torch>=2.0.1
+transformers>=4.32.0
+
+# Web framework (for future web UI)
+fastapi>=0.101.1
+uvicorn>=0.23.2
+jinja2>=3.1.2
+
+# Additional utilities
+nameparser>=1.1.2
+python-whois>=0.8.0
+tldextract>=3.4.4
+validators>=0.22.0
+filelock>=3.12.3
+tqdm>=4.66.1
+colorama>=0.4.6
+tabulate>=0.9.0
