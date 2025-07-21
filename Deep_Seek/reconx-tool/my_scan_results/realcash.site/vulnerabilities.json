@@ -1,0 +1,37 @@
+[
+  {
+    "url": "http://amass6.realcash.site/admin",
+    "type": "LFI",
+    "severity": "Low",
+    "description": "Potential XXE vulnerability detected",
+    "tool": "Nuclei"
+  },
+  {
+    "url": "http://assetfinder8.realcash.site/api",
+    "type": "RCE",
+    "severity": "Critical",
+    "description": "Potential SQL Injection vulnerability detected",
+    "tool": "Nuclei"
+  },
+  {
+    "url": "http://amass6.realcash.site/login",
+    "type": "XXE",
+    "severity": "Critical",
+    "description": "Possible data exposure",
+    "tool": "CustomCheck"
+  },
+  {
+    "url": "http://subfinder14.realcash.site/.env",
+    "type": "SQL Injection",
+    "severity": "Medium",
+    "description": "Possible data exposure",
+    "tool": "CustomCheck"
+  },
+  {
+    "url": "http://amass11.realcash.site/login",
+    "type": "SSRF",
+    "severity": "Critical",
+    "description": "Possible misconfiguration",
+    "tool": "CustomCheck"
+  }
+]

@@ -1,0 +1,15 @@
+http://subfinder2.realcash.site/backup.zip
+http://subfinder2.realcash.site/database.sql
+http://subfinder2.realcash.site/config.bak
+http://amass3.realcash.site/backup.zip
+http://amass3.realcash.site/database.sql
+http://amass3.realcash.site/config.bak
+http://amass13.realcash.site/backup.zip
+http://amass13.realcash.site/database.sql
+http://amass13.realcash.site/config.bak
+http://assetfinder7.realcash.site/backup.zip
+http://assetfinder7.realcash.site/database.sql
+http://assetfinder7.realcash.site/config.bak
+http://amass16.realcash.site/backup.zip
+http://amass16.realcash.site/database.sql
+http://amass16.realcash.site/config.bak
