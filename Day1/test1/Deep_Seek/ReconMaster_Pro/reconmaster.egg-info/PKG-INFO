@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: reconmaster
+Version: 2.0.0
+Requires-Python: >=3.8
+Requires-Dist: rich>=13.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: aiohttp>=3.8
+Requires-Dist: psutil>=5.9
+Dynamic: requires-dist
+Dynamic: requires-python
