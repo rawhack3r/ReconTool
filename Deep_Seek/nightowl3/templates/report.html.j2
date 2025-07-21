@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NightOwl Report - {{ target }}</title>
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --darker-bg: #0a0f1f;
+            --accent: #6366f1;
+            --critical: #ef4444;
+            --high: #f97316;
+            --medium: #eab308;
+            --low: #10b981;
+            --info: #3b82f6;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--darker-bg) 0%, #1e293b 100%);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid var(--accent);
+        }
+        
+        h1 {
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .report-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            background-color: #1e293b;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stat-card {
+            background-color: #1e293b;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid #334155;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+        
+        .section {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #fff;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .vulnerability-list {
+            list-style: none;
+        }
+        
+        .vulnerability-item {
+            background-color: #1e293b;
+            border-left: 4px solid var(--critical);
+            border-radius: 5px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .vulnerability-item:hover {
+            background-color: #2d3748;
+            transform: translateX(5px);
+        }
+        
+        .vulnerability-item.high {
+            border-left-color: var(--high);
+        }
+        
+        .vulnerability-item.medium {
+            border-left-color: var(--medium);
+        }
+        
+        .vulnerability-item.low {
+            border-left-color: var(--low);
+        }
+        
+        .vulnerability-item.info {
+            border-left-color: var(--info);
+        }
+        
+        .vulnerability-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .vulnerability-meta {
+            display: flex;
+            gap: 1rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .vulnerability-description {
+            margin-bottom: 1rem;
+        }
+        
+        .recommendation {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--low);
+            padding: 1rem;
+            border-radius: 0 5px 5px 0;
+            margin-top: 1rem;
+        }
+        
+        .assets-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .asset-card {
+            background-color: #1e293b;
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid #334155;
+        }
+        
+        .asset-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .asset-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #6366f1;
+        }
+        
+        .asset-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .asset-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .asset-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .critical {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        .high {
+            color: #f97316;
+        }
+        
+        .medium {
+            color: #eab308;
+        }
+        
+        .checklist {
+            background-color: #1e293b;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .checklist h3 {
+            color: #6366f1;
+            margin-bottom: 1rem;
+        }
+        
+        .checklist ul {
+            padding-left: 1.5rem;
+        }
+        
+        .checklist li {
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+            border-top: 1px solid #334155;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        .badge.critical {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .badge.high {
+            background-color: rgba(249, 115, 22, 0.2);
+            color: #f97316;
+        }
+        
+        .badge.medium {
+            background-color: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+        }
+        
+        .badge.low {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .badge.info {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .assets-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NightOwl Reconnaissance Report</h1>
+            <div class="subtitle">Comprehensive Attack Surface Analysis</div>
+            <div class="report-meta">
+                <div class="meta-item">Target: {{ target }}</div>
+                <div class="meta-item">Mode: {{ mode }}</div>
+                <div class="meta-item">Date: {{ date }}</div>
+                <div class="meta-item">Duration: {{ duration }}</div>
+            </div>
+        </header>
+        
+        <div class="summary">
+            <h2>Executive Summary</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.subdomains.count }}</div>
+                    <div class="stat-label">Subdomains Discovered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.live_hosts.count }}</div>
+                    <div class="stat-label">Live Hosts Found</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.vulns | length }}</div>
+                    <div class="stat-label">Vulnerabilities Identified</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.secrets | length }}</div>
+                    <div class="stat-label">Secrets Exposed</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Critical Vulnerabilities</h2>
+            <ul class="vulnerability-list">
+                {% for vuln in results.vulns %}
+                <li class="vulnerability-item {{ vuln.severity }}">
+                    <div class="vulnerability-title">
+                        <span class="badge {{ vuln.severity }}">{{ vuln.severity | upper }}</span>
+                        {{ vuln.name }}
+                    </div>
+                    <div class="vulnerability-meta">
+                        <span>Target: {{ vuln.target }}</span>
+                        <span>Tool: {{ vuln.tool }}</span>
+                    </div>
+                    <div class="vulnerability-description">
+                        {{ vuln.description | truncate(200) }}
+                    </div>
+                    {% if vuln.recommendation %}
+                    <div class="recommendation">
+                        <strong>Recommendation:</strong> {{ vuln.recommendation }}
+                    </div>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li class="vulnerability-item info">
+                    <div class="vulnerability-title">No critical vulnerabilities found</div>
+                    <div class="vulnerability-description">
+                        No critical vulnerabilities were identified during the scan.
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Assets Overview</h2>
+            <div class="assets-section">
+                <div class="asset-card">
+                    <div class="asset-title">Important Subdomains</div>
+                    <ul class="asset-list">
+                        {% for domain in results.important_domains %}
+                        <li>{{ domain }}</li>
+                        {% else %}
+                        <li>No important domains identified</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="asset-card">
+                    <div class="asset-title">Sensitive Information</div>
+                    <ul class="asset-list">
+                        {% for secret in results.secrets %}
+                        <li>{{ secret.type }}: {{ secret.value | truncate(40) }}</li>
+                        {% else %}
+                        <li>No sensitive information found</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="asset-card">
+                    <div class="asset-title">Exposed Credentials</div>
+                    <ul class="asset-list">
+                        {% for cred in results.credentials %}
+                        <li>{{ cred.type }}: {{ cred.value | truncate(40) }}</li>
+                        {% else %}
+                        <li>No exposed credentials found</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Manual Testing Checklist</h2>
+            <div class="checklist">
+                <h3>Critical Areas to Verify</h3>
+                <ul>
+                    <li>Test all authentication flows for bypass vulnerabilities</li>
+                    <li>Verify access controls on all privileged endpoints</li>
+                    <li>Check for IDOR vulnerabilities in object references</li>
+                    <li>Test all input fields for XSS and injection vulnerabilities</li>
+                    <li>Verify proper error handling and information leakage</li>
+                    <li>Test for business logic vulnerabilities in workflows</li>
+                    <li>Check CORS configuration for misconfigurations</li>
+                    <li>Verify secure cookie settings (HttpOnly, Secure flags)</li>
+                </ul>
+                
+                <h3>Special Attention Domains</h3>
+                <ul>
+                    {% for domain in results.important_domains[:5] %}
+                    <li>{{ domain }}</li>
+                    {% else %}
+                    <li>No domains flagged for special attention</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Generated by NightOwl Reconnaissance Suite | AI-Powered Security Scanning</p>
+            <p>Report generated at {{ end_time }} | Duration: {{ duration }}</p>
+        </footer>
+    </div>
+</body>
+</html>

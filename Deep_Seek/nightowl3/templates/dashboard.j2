@@ -1,0 +1,73 @@
+<div class="dashboard">
+    <div class="header">
+        <h1>NightOwl Reconnaissance Suite</h1>
+        <div class="target-info">
+            <span class="target">{{ target }}</span>
+            <span class="mode">Mode: {{ mode }}</span>
+            <span class="type">Type: {{ target_type }}</span>
+            <span class="start-time">Started: {{ start_time }}</span>
+        </div>
+        <div class="resources">
+            <span>CPU: {{ resources.cpu }}%</span>
+            <span>MEM: {{ resources.mem }}%</span>
+            <span>NET: ▲{{ resources.net_sent }}KB/s ▼{{ resources.net_recv }}KB/s</span>
+        </div>
+    </div>
+    
+    <div class="body">
+        <div class="phases">
+            <h2>Workflow Progress</h2>
+            <ul>
+                {% for phase, status in phases.items() %}
+                <li class="{{ status.status }}">
+                    {{ phase }}: {{ status.status|capitalize }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="tools">
+            <h2>Tool Status</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Status</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tool, data in tool_progress.items() %}
+                    <tr class="{{ data.status }}">
+                        <td>{{ tool }}</td>
+                        <td>{{ data.status|capitalize }}</td>
+                        <td>{{ data.summary or data.reason or '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="progress">
+            <div class="progress-bar" style="width: {{ overall_progress }}%;">
+                {{ overall_progress }}%
+            </div>
+        </div>
+        
+        {% if errors %}
+        <div class="errors">
+            <h3>Recent Errors</h3>
+            <ul>
+                {% for error in errors[-3:] %}
+                <li>
+                    <strong>{{ error.tool }}:</strong>
+                    {{ error.error|truncate(50) }} ({{ error.timestamp }})
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
