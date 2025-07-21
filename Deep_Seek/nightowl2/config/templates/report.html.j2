@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NightOwl Report - {{ target }}</title>
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --darker-bg: #0a0f1f;
+            --accent: #6366f1;
+            --critical: #ef4444;
+            --high: #f97316;
+            --medium: #eab308;
+            --low: #10b981;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            background-color: var(--darker-bg);
+            padding: 1.5rem 0;
+            border-bottom: 2px solid var(--accent);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #fff;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+        }
+        
+        .summary {
+            background-color: #1e293b;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stat-card {
+            background-color: #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .section {
+            background-color: #1e293b;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #fff;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+        
+        .vulnerability-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .vulnerability-item {
+            background-color: #334155;
+            border-left: 4px solid var(--critical);
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+        
+        .vulnerability-item.high {
+            border-left-color: var(--high);
+        }
+        
+        .vulnerability-item.medium {
+            border-left-color: var(--medium);
+        }
+        
+        .vulnerability-item.low {
+            border-left-color: var(--low);
+        }
+        
+        .asset-map {
+            width: 100%;
+            height: 600px;
+            background-color: #334155;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .ai-insights {
+            background-color: #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>NightOwl Reconnaissance Report</h1>
+            <div class="subtitle">{{ target }} | {{ mode }} Scan | {{ start_time }} to {{ end_time }}</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="summary">
+            <h2>Executive Summary</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.subdomains | length }}</div>
+                    <div class="stat-label">Subdomains Discovered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.vulnerabilities | length }}</div>
+                    <div class="stat-label">Vulnerabilities Found</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.ai_insights.findings | length }}</div>
+                    <div class="stat-label">AI Insights</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.attack_surface.critical_node_count }}</div>
+                    <div class="stat-label">Critical Assets</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Attack Surface Map</h2>
+            <div class="asset-map">
+                <!-- Interactive attack surface visualization would be embedded here -->
+                <p style="text-align: center; padding-top: 250px;">Interactive Attack Surface Visualization</p>
+            </div>
+            <p>Exposure Score: {{ results.attack_surface.exposure_score }}%</p>
+        </div>
+        
+        <div class="section">
+            <h2>Critical Vulnerabilities</h2>
+            <ul class="vulnerability-list">
+                {% for vuln in results.vulnerabilities %}
+                <li class="vulnerability-item {{ vuln.severity }}">
+                    <strong>{{ vuln.name }}</strong> ({{ vuln.severity | upper }})
+                    <p>{{ vuln.description }}</p>
+                    <p>Found on: {{ vuln.target }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>AI-Powered Insights</h2>
+            {% for insight in results.ai_insights.findings %}
+            <div class="ai-insights">
+                <h3>{{ insight.title }}</h3>
+                <p>{{ insight.description }}</p>
+                <p><strong>Confidence:</strong> {{ insight.confidence }}%</p>
+                <p><strong>Recommendations:</strong> {{ insight.recommendations }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="section">
+            <h2>Threat Intelligence</h2>
+            <h3>AlienVault OTX</h3>
+            <p>Threat Pulses: {{ results.threat_intel.pulses | length }}</p>
+            
+            <h3>VirusTotal</h3>
+            <p>Reputation Score: {{ results.virustotal.reputation }}</p>
+            <p>Malicious Detections: {{ results.virustotal.malicious }}</p>
+        </div>
+        
+        <div class="section">
+            <h2>Scan Details</h2>
+            <p><strong>Start Time:</strong> {{ start_time }}</p>
+            <p><strong>End Time:</strong> {{ end_time }}</p>
+            <p><strong>Duration:</strong> {{ duration }}</p>
+            <p><strong>Mode:</strong> {{ mode }}</p>
+            <p><strong>Target Type:</strong> {{ target_type }}</p>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Generated by NightOwl Reconnaissance Suite | AI-Powered Security Scanning</p>
+            <p>Report generated at {{ end_time }}</p>
+        </div>
+    </footer>
+</body>
+</html>
