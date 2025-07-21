@@ -1,0 +1,51 @@
+# NightOwl Phase Order (list format expected by load_phases_config)
+
+- name: passive
+  description: "Passive subdomain enumeration"
+  tools: [subfinder, findomain, assetfinder, amass_passive, crtsh]
+  required: true
+
+- name: active
+  description: "Active enumeration with DNS resolution"
+  tools: [amass_active, oneforall]
+  required: false
+
+- name: brute
+  description: "DNS brute force and wordlist enumeration"
+  tools: [ffuf_dns, puredns]
+  required: false
+
+- name: probe
+  description: "Probing subdomains for alive hosts and ports"
+  tools: [httpx, naabu]
+  required: true
+
+- name: important
+  description: "Extract secrets, emails, and sensitive paths"
+  tools: []
+  required: true
+
+- name: osint
+  description: "Gather OSINT data from archives and URLs"
+  tools: [gau, waybackurls]
+  required: false
+
+- name: vuln
+  description: "Run vulnerability scanners"
+  tools: [nuclei, subjack]
+  required: true
+
+- name: github
+  description: "Detect leaks in GitHub repositories"
+  tools: []
+  required: false
+
+- name: cloud
+  description: "Cloud misconfigurations and bucket discovery"
+  tools: []
+  required: false
+
+- name: report_phase          # must match phases/report_phase.py
+  description: "Generate final HTML/Markdown report"
+  tools: []
+  required: true

@@ -1,0 +1,34 @@
+{
+  "_version": 1,
+  "completed_phases": [
+    "vuln",
+    "active",
+    "cloud",
+    "brute",
+    "passive",
+    "important",
+    "osint",
+    "report",
+    "probe",
+    "github"
+  ],
+  "failed_tools": {
+    "gau": {
+      "error": "/bin/sh: 1: cannot create /home/nightowl/1807/Chat/NightOwl/output/example.com/osint/gau_urls.txt: Directory nonexistent\n",
+      "phase": "osint"
+    },
+    "httpx": {
+      "error": "[\u001b[1;31mFTL\u001b[0m] No input provided: no files found\n",
+      "phase": "probe"
+    },
+    "nuclei": {
+      "error": "\n                     __     _\n   ____  __  _______/ /__  (_)\n  / __ \\/ / / / ___/ / _ \\/ /\n / / / / /_/ / /__/ /  __/ /\n/_/ /_/\\__,_/\\___/_/\\___/_/   v2.9.15\n\n\t\tprojectdiscovery.io\n\n[\u001b[1;31mFTL\u001b[0m] Could not create runner: could not create input provider: could not open targets file: open /home/nightowl/1807/Chat/NightOwl/output/example.com/subdomains/alive_httpx.txt: no such file or directory\n",
+      "phase": "vuln"
+    },
+    "waybackurls": {
+      "error": "/bin/sh: 1: cannot create /home/nightowl/1807/Chat/NightOwl/output/example.com/osint/waybackurls.txt: Directory nonexistent\n",
+      "phase": "osint"
+    }
+  },
+  "updated": "2025-07-18T19:36:07.447120Z"
+}

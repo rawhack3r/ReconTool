@@ -1,0 +1,66 @@
+# NightOwl tools configuration
+
+subfinder:
+  cmd: "subfinder -d {target} -silent -o {outdir}/subdomains/subfinder.txt"
+  group: passive
+  timeout: 90
+
+
+findomain:
+  cmd: "findomain -t {target} -q > {outdir}/subdomains/findomain.txt"
+  stage: any
+
+assetfinder:
+  cmd: "assetfinder --subs-only {target} > {outdir}/subdomains/assetfinder.txt"
+  stage: any
+
+amass_passive:
+  cmd: "amass enum -passive -d {target} -timeout 60 -max-dns-queries 100 -o {output}/subdomains/amass_passive.txt"
+  stage: any
+  group: passive
+  timeout: 180  # Hard timeout in seconds
+
+
+crtsh:
+  cmd: "curl -s 'https://crt.sh/?q=%25.{target}&output=json' | jq -r '.[]?.name_value' | tr '\\r' '\\n' | sort -u > {outdir}/subdomains/crtsh.txt"
+  stage: any
+
+amass_active:
+  cmd: "amass enum -active -d {target} -o {outdir}/subdomains/amass_active.txt"
+  stage: deep
+
+oneforall:
+  cmd: "oneforall --target {target} --output {outdir}/subdomains/oneforall.txt"
+  stage: deep
+
+ffuf_dns:
+  cmd: "ffuf -u http://FUZZ.{target} -w /usr/share/wordlists/dns.txt -of csv -o {outdir}/subdomains/ffuf_dns.csv"
+  stage: deeper
+
+puredns:
+  cmd: "puredns bruteforce /usr/share/wordlists/dns.txt {target} -w {outdir}/subdomains/puredns.txt"
+  stage: deeper
+
+httpx:
+  cmd: "httpx -l {outdir}/subdomains/resolved.txt -silent -o {outdir}/subdomains/alive_httpx.txt"
+  stage: any
+
+naabu:
+  cmd: "naabu -list {outdir}/subdomains/resolved.txt -o {outdir}/probe/naabu_ports.txt"
+  stage: deep
+
+gau:
+  cmd: "gau {target} > {outdir}/osint/gau_urls.txt"
+  stage: any
+
+waybackurls:
+  cmd: "echo {target} | waybackurls > {outdir}/osint/waybackurls.txt"
+  stage: any
+
+nuclei:
+  cmd: "nuclei -l {outdir}/subdomains/alive_httpx.txt -o {outdir}/vuln/nuclei_raw.txt"
+  stage: deep
+
+subjack:
+  cmd: "subjack -w {outdir}/subdomains/resolved.txt -c fingerprints.json -o {outdir}/vuln/takeovers.txt"
+  stage: deep
