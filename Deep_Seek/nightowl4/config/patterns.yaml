@@ -1,0 +1,7 @@
+emails: '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+phones: '\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b'
+names: '\b(?:Mr\.|Mrs\.|Ms\.|Dr\.)?\s*[A-Z][a-z]+\s+[A-Z][a-z]+\b'
+secrets:
+  api_key: '(?i)(api|key|token|secret)[_-]?key["\']?s*[:=]s*["\']?([a-z0-9]{20,40})["\']?'
+  aws_key: '(?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])'
+  aws_secret: '(?<![A-Za-z0-9/+=])[A-Za-z0-9/+=]{40}(?![A-Za-z0-9/+=])'
