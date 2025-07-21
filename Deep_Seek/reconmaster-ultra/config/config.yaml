@@ -1,0 +1,24 @@
+# ReconMaster Configuration
+version: 3.0
+
+# Tool configurations
+tools:
+  subdomain:
+    passive: ["amass", "subfinder", "assetfinder"]
+    active: ["puredns"]
+  http:
+    tools: ["httpx"]
+  vuln:
+    scanners: ["nuclei"]
+    
+# Wordlists
+wordlists:
+  subdomains: "resources/wordlists/subdomains.txt"
+  directories: "resources/wordlists/directories.txt"
+  extensions: "resources/wordlists/extensions.txt"
+
+# Resource limits
+resource:
+  max_threads: 8
+  cpu_threshold: 80
+  ram_threshold: 85

@@ -1,0 +1,5 @@
+shodan: YOUR_SHODAN_API_KEY
+greynoise: YOUR_GREYNOISE_API_KEY
+censys:
+  id: YOUR_CENSYS_ID
+  secret: YOUR_CENSYS_SECRET

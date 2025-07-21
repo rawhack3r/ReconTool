@@ -1,0 +1,9 @@
+passive:
+  - name: amass
+    command: "amass enum -brute -d {target} -w wordlists/all.txt"
+    timeout: 600
+
+active:
+  - name: naabu
+    command: "naabu -host {target} -p - -silent"
+    timeout: 1200
