@@ -1,4 +1,0 @@
-psutil==6.0.0
-sublist3r==1.1.0
-requests==2.31.0
-beautifulsoup4==4.12.2
