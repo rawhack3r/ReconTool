@@ -1,0 +1,17 @@
+[
+  {
+    "domain": "dev.example.com"
+  },
+  {
+    "domain": "products.example.com"
+  },
+  {
+    "domain": "support.example.com"
+  },
+  {
+    "domain": "www.example.com"
+  },
+  {
+    "domain": "m.example.com"
+  }
+]

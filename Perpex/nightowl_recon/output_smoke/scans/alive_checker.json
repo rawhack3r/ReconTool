@@ -1,0 +1,14 @@
+[
+  {
+    "domain": "example.com",
+    "protocol": "http",
+    "status": "alive",
+    "status_code": 200
+  },
+  {
+    "domain": "example.com",
+    "protocol": "https",
+    "status": "alive",
+    "status_code": 200
+  }
+]
