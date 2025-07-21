@@ -1,0 +1,1362 @@
+nightowlPart2
+
+
+tools/ 
+
+
+api_security.py
+
+import re
+import json
+import requests
+from core.error_handler import ErrorHandler
+
+class APISecurityScanner:
+    def __init__(self):
+        self.auth_patterns = [
+            r"Authorization: Bearer\s+([\w-]+\.[\w-]+\.[\w-]+)",
+            r"api_key=([\w]{32,64})",
+            r"\"access_token\":\"([\w-]+)\""
+        ]
+        self.endpoint_risks = {
+            "user/create": 9,
+            "admin/": 10,
+            "password/reset": 8,
+            "token/refresh": 9
+        }
+    
+    def scan_swagger(self, url):
+        try:
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                spec = response.json()
+                vulnerabilities = []
+                
+                for path, methods in spec.get('paths', {}).items():
+                    if any(kw in path for kw in self.endpoint_risks.keys()):
+                        for method, details in methods.items():
+                            if 'security' not in details:
+                                vulnerabilities.append({
+                                    "path": path,
+                                    "method": method.upper(),
+                                    "issue": "Missing authentication",
+                                    "severity": self.endpoint_risks.get(
+                                        next(kw for kw in self.endpoint_risks if kw in path), 7)
+                                })
+                return vulnerabilities
+        except Exception as e:
+            ErrorHandler.log_error("APIScanner", f"Swagger error: {str(e)}", url)
+        return []
+
+    def detect_broken_object_auth(self, api_url):
+        test_ids = ["1000", "1001", "admin"]
+        results = []
+        for test_id in test_ids:
+            try:
+                test_url = f"{api_url}/{test_id}"
+                response = requests.get(test_url, timeout=5)
+                
+                if response.status_code == 200:
+                    results.append({
+                        "url": test_url,
+                        "issue": "Possible IDOR vulnerability",
+                        "confidence": "medium",
+                        "severity": 8
+                    })
+            except:
+                continue
+        return results
+
+    def find_graphql_endpoints(self, base_url):
+        endpoints = []
+        test_urls = [
+            f"{base_url}/graphql",
+            f"{base_url}/graphiql",
+            f"{base_url}/v1/graphql",
+            f"{base_url}/api/graphql"
+        ]
+        
+        for url in test_urls:
+            try:
+                response = requests.post(url, json={"query": "{__schema{types{name}}"}, timeout=5)
+                if response.status_code == 200 and "application/json" in response.headers.get('Content-Type', ''):
+                    if "data" in response.json():
+                        endpoints.append({
+                            "url": url,
+                            "type": "GraphQL",
+                            "introspection": self.check_introspection(response.json())
+                        })
+            except:
+                continue
+        return endpoints
+
+    def check_introspection(self, response):
+        return bool(response.get('data', {}).get('__schema', None))
+
+def run(target, progress_callback=None):
+    scanner = APISecurityScanner()
+    results = {
+        "swagger_vulns": [],
+        "idor_issues": [],
+        "graphql_endpoints": [],
+        "exposed_auth_tokens": []
+    }
+    
+    try:
+        if progress_callback:
+            progress_callback("APISecurity", 20, "Locating API docs...")
+        
+        swagger_urls = [
+            f"http://{target}/swagger.json",
+            f"https://{target}/openapi.json",
+            f"http://api.{target}/v2/api-docs"
+        ]
+        
+        for url in swagger_urls:
+            vulns = scanner.scan_swagger(url)
+            if vulns:
+                results["swagger_vulns"].extend(vulns)
+        
+        if progress_callback:
+            progress_callback("APISecurity", 50, "Testing object authorization...")
+        
+        test_endpoints = [
+            f"http://{target}/api/users",
+            f"https://{target}/v1/accounts"
+        ]
+        
+        for endpoint in test_endpoints:
+            results["idor_issues"].extend(
+                scanner.detect_broken_object_auth(endpoint)
+            )
+        
+        if progress_callback:
+            progress_callback("APISecurity", 70, "Scanning for GraphQL...")
+        
+        results["graphql_endpoints"] = scanner.find_graphql_endpoints(
+            f"http://{target}")
+        
+        if progress_callback:
+            progress_callback("APISecurity", 85, "Checking for exposed tokens...")
+        
+        # Simulated findings
+        results["exposed_auth_tokens"].append({
+            "source": f"https://ui.{target}/main.js",
+            "token_snippet": "Bearer eyJhbGci...",
+            "type": "JWT",
+            "severity": 9
+        })
+        
+        if progress_callback:
+            progress_callback("APISecurity", 100, "API security scan completed")
+            
+    except Exception as e:
+        ErrorHandler.log_error("APISecurity", str(e), target)
+        raise
+        
+    return results
+
+
+api_sequences.py
+
+import random
+from core.error_handler import ErrorHandler
+
+class APISequenceTester:
+    def __init__(self):
+        self.sequences = [
+            ["register", "login", "profile"],
+            ["login", "cart", "checkout"],
+            ["login", "document_upload", "download"]
+        ]
+    
+    def generate_test_cases(self, endpoints):
+        """Create stateful test sequences"""
+        test_cases = []
+        for seq in self.sequences:
+            valid_sequence = [e for e in seq if e in endpoints]
+            if valid_sequence:
+                test_cases.append(valid_sequence)
+        
+        # Add random sequences for fuzzing
+        for _ in range(5):
+            test_cases.append(random.sample(list(endpoints.keys()), min(3, len(endpoints))))
+        
+        return test_cases
+    
+    def execute_sequence(self, sequence, base_url):
+        """Execute API sequence with state maintenance"""
+        session = requests.Session()
+        state = {}
+        results = []
+        
+        for step in sequence:
+            endpoint = base_url + step["path"]
+            try:
+                # Prepare request with current state
+                request_data = self.inject_state(step["parameters"], state)
+                
+                # Execute request
+                if step["method"] == "GET":
+                    response = session.get(endpoint, params=request_data)
+                else:
+                    response = session.post(endpoint, json=request_data)
+                
+                # Save state from response
+                self.extract_state(response.json(), state)
+                
+                results.append({
+                    "step": step["name"],
+                    "status": response.status_code,
+                    "state": state.copy()
+                })
+            except Exception as e:
+                ErrorHandler.log_error("APISequence", str(e), base_url)
+                results.append({"step": step["name"], "error": str(e)})
+        
+        return results
+    
+    def inject_state(self, params, state):
+        """Inject current state into request parameters"""
+        # Implementation would replace placeholders with state values
+        return params
+    
+    def extract_state(self, response, state):
+        """Extract state values from API response"""
+        # Implementation would parse response for state tokens
+        pass
+
+
+asset_discovery.py
+
+import requests
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Discover digital assets associated with the target"""
+    results = {"assets": []}
+    
+    try:
+        # Shodan-like discovery (simplified)
+        if progress_callback:
+            progress_callback("AssetDiscovery", 20, "Querying asset databases...")
+        
+        # In a real implementation, this would integrate with Shodan/Censys APIs
+        asset_types = [
+            {"type": "web_server", "value": f"web-01.{target}"},
+            {"type": "database", "value": f"db-01.{target}"},
+            {"type": "cdn", "value": f"cdn.{target}"},
+            {"type": "mail_server", "value": f"mail.{target}"},
+        ]
+        
+        results["assets"] = asset_types
+        
+        if progress_callback:
+            progress_callback("AssetDiscovery", 100, f"Found {len(asset_types)} assets")
+            
+    except Exception as e:
+        ErrorHandler.log_error("AssetDiscovery", str(e), target)
+        raise
+        
+    return results
+
+cloud_scanner.py
+
+import boto3
+import botocore
+from botocore.exceptions import ClientError
+from core.error_handler import ErrorHandler
+
+class CloudAuditor:
+    def __init__(self, profile=None):
+        self.session = boto3.Session(profile_name=profile)
+        self.iam = self.session.client('iam')
+        self.s3 = self.session.client('s3')
+    
+    def audit_iam(self):
+        findings = []
+        
+        # Check for admin privileges
+        policies = self.iam.list_policies(Scope='Local')['Policies']
+        for policy in policies:
+            policy_doc = self.iam.get_policy_version(
+                PolicyArn=policy['Arn'],
+                VersionId=policy['DefaultVersionId']
+            )['PolicyVersion']['Document']
+            
+            if self.is_admin_policy(policy_doc):
+                findings.append({
+                    "type": "IAM Policy",
+                    "name": policy['PolicyName'],
+                    "issue": "Administrative privileges",
+                    "severity": 10
+                })
+        
+        # Check for inactive access keys
+        users = self.iam.list_users()['Users']
+        for user in users:
+            keys = self.iam.list_access_keys(UserName=user['UserName'])['AccessKeyMetadata']
+            for key in keys:
+                if key['Status'] == 'Active':
+                    last_used = self.iam.get_access_key_last_used(
+                        AccessKeyId=key['AccessKeyId']
+                    ).get('AccessKeyLastUsed', {})
+                    if not last_used.get('LastUsedDate'):
+                        findings.append({
+                            "type": "Access Key",
+                            "user": user['UserName'],
+                            "issue": "Unused active access key",
+                            "severity": 7
+                        })
+        return findings
+    
+    def audit_s3(self):
+        findings = []
+        buckets = self.s3.list_buckets()['Buckets']
+        
+        for bucket in buckets:
+            bucket_name = bucket['Name']
+            
+            # Check public access
+            try:
+                acl = self.s3.get_bucket_acl(Bucket=bucket_name)
+                for grant in acl['Grants']:
+                    if grant['Grantee'].get('URI') == 'http://acs.amazonaws.com/groups/global/AllUsers':
+                        findings.append({
+                            "type": "S3 Bucket",
+                            "name": bucket_name,
+                            "issue": "Public read access",
+                            "severity": 9
+                        })
+            except ClientError:
+                pass
+            
+            # Check encryption
+            try:
+                encryption = self.s3.get_bucket_encryption(Bucket=bucket_name)
+                if not encryption.get('ServerSideEncryptionConfiguration'):
+                    findings.append({
+                        "type": "S3 Bucket",
+                        "name": bucket_name,
+                        "issue": "No server-side encryption",
+                        "severity": 8
+                    })
+            except ClientError:
+                findings.append({
+                    "type": "S3 Bucket",
+                    "name": bucket_name,
+                    "issue": "No server-side encryption",
+                    "severity": 8
+                })
+        return findings
+    
+    def is_admin_policy(self, policy_doc):
+        for statement in policy_doc.get('Statement', []):
+            if statement.get('Effect') == 'Allow':
+                if statement.get('Action') == '*' or statement.get('Resource') == '*':
+                    return True
+                if 'Action' in statement and isinstance(statement['Action'], list):
+                    if 'iam:*' in statement['Action'] or '*' in statement['Action']:
+                        return True
+        return False
+
+def run(target, progress_callback=None):
+    auditor = CloudAuditor()
+    results = {
+        "iam_findings": [],
+        "s3_findings": []
+    }
+    
+    try:
+        if progress_callback:
+            progress_callback("CloudAudit", 20, "Auditing IAM policies...")
+        results["iam_findings"] = auditor.audit_iam()
+        
+        if progress_callback:
+            progress_callback("CloudAudit", 50, "Checking S3 buckets...")
+        results["s3_findings"] = auditor.audit_s3()
+        
+        if progress_callback:
+            progress_callback("CloudAudit", 100, "Cloud audit completed")
+            
+    except botocore.exceptions.NoCredentialsError:
+        ErrorHandler.log_error("CloudAudit", "No AWS credentials found", target)
+    except Exception as e:
+        ErrorHandler.log_error("CloudAudit", str(e), target)
+        raise
+        
+    return results
+
+content_discovery.py
+
+import os
+import requests
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Discover content and directories on web servers"""
+    results = {
+        "directories": [],
+        "files": [],
+        "interesting_paths": []
+    }
+    
+    # Get list of live domains from previous results
+    live_domains = _get_live_domains(target)
+    
+    for domain in live_domains:
+        if progress_callback:
+            progress_callback("content_discovery", 10, f"Scanning {domain}")
+        
+        # Check common directories
+        for directory in ["admin", "backup", "config", "api", "internal"]:
+            url = f"http://{domain}/{directory}"
+            if _check_url(url):
+                results["directories"].append({
+                    "url": url,
+                    "status": 200,
+                    "domain": domain
+                })
+        
+        # Check common files
+        for file in ["robots.txt", "sitemap.xml", ".env", "config.json"]:
+            url = f"http://{domain}/{file}"
+            if _check_url(url):
+                results["files"].append({
+                    "url": url,
+                    "status": 200,
+                    "domain": domain
+                })
+    
+    # Categorize interesting findings
+    results["interesting_paths"] = [
+        item for item in results["directories"] + results["files"]
+        if _is_interesting(item["url"])
+    ]
+    
+    return results
+
+def _get_live_domains(target):
+    """Retrieve live domains from previous scan results"""
+    # In a real implementation, this would read from the state or output files
+    return [f"www.{target}", target]
+
+def _check_url(url):
+    """Check if a URL exists"""
+    try:
+        response = requests.get(url, timeout=5, verify=False)
+        return response.status_code == 200
+    except:
+        return False
+
+def _is_interesting(url):
+    """Determine if a path is particularly interesting"""
+    interesting_keywords = [
+        "admin", "backup", "config", "secret", 
+        "api", "internal", "credential", "token"
+    ]
+    return any(kw in url for kw in interesting_keywords)
+
+crypto_monitor.py
+
+import requests
+from web3 import Web3
+
+class CryptoMonitor:
+    CHAINS = {
+        "bitcoin": "https://blockchain.info",
+        "ethereum": "https://api.etherscan.io/api",
+        "polygon": "https://api.polygonscan.com/api"
+    }
+    
+    def get_address_balance(self, address, chain="ethereum"):
+        """Get current balance of cryptocurrency address"""
+        if chain == "bitcoin":
+            url = f"{self.CHAINS[chain]}/rawaddr/{address}"
+            data = requests.get(url).json()
+            return data["final_balance"]
+        else:
+            url = f"{self.CHAINS[chain]}?module=account&action=balance&address={address}"
+            data = requests.get(url).json()
+            return int(data["result"]) / 10**18
+    
+    def monitor_for_transactions(self, addresses, chain="ethereum"):
+        """Detect recent transactions to addresses"""
+        alerts = []
+        for address in addresses:
+            if chain == "bitcoin":
+                url = f"{self.CHAINS[chain]}/rawaddr/{address}"
+                data = requests.get(url).json()
+                if data["n_tx"] > 0:
+                    alerts.append({
+                        "address": address,
+                        "transactions": data["n_tx"],
+                        "total_received": data["total_received"]
+                    })
+            else:
+                url = f"{self.CHAINS[chain]}?module=account&action=txlist&address={address}&sort=desc"
+                data = requests.get(url).json()
+                if data["result"]:
+                    latest = data["result"][0]
+                    alerts.append({
+                        "address": address,
+                        "value": int(latest["value"]) / 10**18,
+                        "timestamp": latest["timeStamp"]
+                    })
+        return alerts
+    
+    def check_for_malicious(self, address):
+        """Check if address is flagged as malicious"""
+        try:
+            url = f"https://api.gopluslabs.io/api/v1/address_security/{address}?chain_id=1"
+            response = requests.get(url, timeout=5)
+            data = response.json()
+            return data["result"]["malicious_address"] > 0
+        except:
+            return False
+
+
+darkweb_intel.py
+
+import requests
+import os
+import re
+from stem import Signal
+from stem.control import Controller
+from datetime import datetime
+from core.error_handler import ErrorHandler
+
+class DarkWebMonitor:
+    def __init__(self):
+        self.session = self.create_tor_session()
+        self.controller = self.connect_controller()
+        self.markets = self.load_market_list()
+        self.forums = self.load_forum_list()
+    
+    def create_tor_session(self):
+        session = requests.Session()
+        session.proxies = {
+            'http': 'socks5h://localhost:9050',
+            'https': 'socks5h://localhost:9050'
+        }
+        return session
+    
+    def connect_controller(self):
+        try:
+            controller = Controller.from_port(port=9051)
+            controller.authenticate(password=os.getenv("TOR_PASSWORD", "nightowl"))
+            return controller
+        except Exception as e:
+            ErrorHandler.log_error("DarkWeb", f"Tor control error: {str(e)}", "system")
+            return None
+    
+    def renew_identity(self):
+        if self.controller:
+            self.controller.signal(Signal.NEWNYM)
+    
+    def load_market_list(self):
+        return [
+            "http://darkmarketxyz.onion",
+            "http://blackbankmarkets.onion"
+        ]
+    
+    def load_forum_list(self):
+        return [
+            "http://darkforumzzz.onion",
+            "http://breachtalk.onion"
+        ]
+    
+    def search_market_listings(self, target):
+        results = []
+        for market in self.markets:
+            try:
+                search_url = f"{market}/search?q={target}"
+                response = self.session.get(search_url, timeout=30)
+                if response.status_code == 200:
+                    listings = self.extract_listings(response.text)
+                    results.append({
+                        "market": market,
+                        "listings": listings,
+                        "count": len(listings)
+                    })
+                self.renew_identity()
+            except Exception as e:
+                ErrorHandler.log_error("DarkWeb", f"Market error: {str(e)}", market)
+        return results
+    
+    def search_forum_mentions(self, target):
+        results = []
+        for forum in self.forums:
+            try:
+                search_url = f"{forum}/search?query={target}"
+                response = self.session.get(search_url, timeout=30)
+                if response.status_code == 200:
+                    mentions = self.extract_mentions(response.text, target)
+                    results.append({
+                        "forum": forum,
+                        "mentions": mentions,
+                        "count": len(mentions)
+                    })
+                self.renew_identity()
+            except Exception as e:
+                ErrorHandler.log_error("DarkWeb", f"Forum error: {str(e)}", forum)
+        return results
+    
+    def extract_listings(self, html):
+        pattern = re.compile(r'<div class="listing">(.*?)</div>', re.DOTALL)
+        return pattern.findall(html)[:3]
+    
+    def extract_mentions(self, text, target):
+        pattern = re.compile(fr"([^.]*?{target}[^.]*\.)", re.IGNORECASE)
+        return pattern.findall(text)
+
+def run(target, progress_callback=None):
+    monitor = DarkWebMonitor()
+    results = {
+        "market_listings": [],
+        "forum_mentions": []
+    }
+    
+    try:
+        if progress_callback:
+            progress_callback("DarkWeb", 30, "Searching dark markets...")
+        results["market_listings"] = monitor.search_market_listings(target)
+        
+        if progress_callback:
+            progress_callback("DarkWeb", 60, "Scanning forums...")
+        results["forum_mentions"] = monitor.search_forum_mentions(target)
+        
+        if progress_callback:
+            progress_callback("DarkWeb", 100, "Dark web scan completed")
+            
+    except Exception as e:
+        ErrorHandler.log_error("DarkWeb", str(e), target)
+        raise
+        
+    return results
+
+
+darkweb_monitor.py
+
+import requests
+import os
+from stem import Signal
+from stem.control import Controller
+from core.error_handler import ErrorHandler
+
+def get_tor_session():
+    """Create Tor session for dark web access"""
+    session = requests.session()
+    session.proxies = {
+        'http': 'socks5h://localhost:9050',
+        'https': 'socks5h://localhost:9050'
+    }
+    return session
+
+def renew_tor_identity():
+    """Renew Tor connection for new exit node"""
+    with Controller.from_port(port=9051) as controller:
+        controller.authenticate(password=os.getenv("TOR_PASSWORD"))
+        controller.signal(Signal.NEWNYM)
+
+def search_dark_web_forums(session, target):
+    """Search dark web forums for target mentions"""
+    forums = [
+        "http://darkzzx4avcsuofgfeup5s4sjzecj53jf4cjd4l4v5kyz7k7vj2qvyd.onion/search?q={target}",
+        "http://tor66sewebgixwhcqm7mozndowt6j7q2fjqvv3dhu2w2mdb5d6rv2ad.onion/search?query={target}"
+    ]
+    results = []
+    
+    for forum in forums:
+        try:
+            url = forum.format(target=target)
+            response = session.get(url, timeout=30)
+            if response.status_code == 200:
+                results.append({
+                    "forum": forum.split('/')[2],
+                    "mentions": len(response.text.lower().split(target.lower())) - 1,
+                    "url": url
+                })
+            renew_tor_identity()
+        except Exception as e:
+            ErrorHandler.log_error("DarkwebMonitor", f"Forum error: {str(e)}", target)
+            continue
+            
+    return results
+
+def run(target, progress_callback=None):
+    """Comprehensive dark web monitoring"""
+    results = {"mentions": [], "leaks": [], "market_listings": []}
+    
+    try:
+        # Initialize Tor session
+        if progress_callback:
+            progress_callback("DarkwebMonitor", 10, "Initializing Tor connection...")
+        
+        tor_session = get_tor_session()
+        
+        # Search forums
+        if progress_callback:
+            progress_callback("DarkwebMonitor", 30, "Scanning dark web forums...")
+        results["mentions"] = search_dark_web_forums(tor_session, target)
+        
+        # Check leak databases
+        if progress_callback:
+            progress_callback("DarkwebMonitor", 60, "Checking leak databases...")
+        
+        # Scan dark markets
+        if progress_callback:
+            progress_callback("DarkwebMonitor", 85, "Scanning marketplaces...")
+        
+        if progress_callback:
+            progress_callback("DarkwebMonitor", 100, "Dark web scan completed")
+            
+    except Exception as e:
+        ErrorHandler.log_error("DarkwebMonitor", str(e), target)
+        raise
+        
+    return results
+
+
+email_extractor.py
+
+import re
+from core.error_handler import ErrorHandler
+
+EMAIL_REGEX = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+
+def extract_emails(content, target_domain):
+    """Extract emails from text content"""
+    emails = set()
+    try:
+        matches = re.finditer(EMAIL_REGEX, content, re.MULTILINE)
+        for match in matches:
+            email = match.group().lower()
+            if email.endswith(f"@{target_domain}") or f".{target_domain}" in email:
+                emails.add(email)
+    except Exception as e:
+        ErrorHandler.log_error("email_extractor", str(e), target_domain)
+    
+    return list(emails)
+
+
+endpoint_extractor.py
+
+import re
+import requests
+from urllib.parse import urljoin
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Extract API endpoints from JavaScript files"""
+    results = {"endpoints": [], "js_files": []}
+    
+    try:
+        base_url = f"http://{target}"
+        
+        if progress_callback:
+            progress_callback("EndpointExtractor", 20, "Fetching homepage...")
+        
+        response = requests.get(base_url, timeout=10)
+        js_files = re.findall(r'<script src="([^"]+\.js)"', response.text)
+        
+        if progress_callback:
+            progress_callback("EndpointExtractor", 40, f"Found {len(js_files)} JS files")
+        
+        endpoint_patterns = [
+            r'fetch\("(/api/[^"]+)"',
+            r'\.get\("(/[^"]+)"',
+            r'url:\s*["\'](https?://[^"\']+)["\']',
+            r'apiEndpoint:\s*["\']([^"\']+)["\']'
+        ]
+        
+        for js_path in js_files:
+            full_url = urljoin(base_url, js_path)
+            results["js_files"].append(full_url)
+            
+            try:
+                js_response = requests.get(full_url, timeout=5)
+                js_content = js_response.text
+                
+                for pattern in endpoint_patterns:
+                    matches = re.findall(pattern, js_content)
+                    for match in matches:
+                        # Ensure relative paths are made absolute
+                        if match.startswith("/"):
+                            endpoint = urljoin(base_url, match)
+                        else:
+                            endpoint = match
+                            
+                        if endpoint not in results["endpoints"]:
+                            results["endpoints"].append(endpoint)
+                            
+            except Exception as e:
+                ErrorHandler.log_error("EndpointExtractor", f"Error processing {full_url}: {str(e)}", target)
+        
+        if progress_callback:
+            progress_callback("EndpointExtractor", 100, f"Extracted {len(results['endpoints'])} endpoints")
+            
+    except Exception as e:
+        ErrorHandler.log_error("EndpointExtractor", str(e), target)
+        raise
+        
+    return results
+
+__init__.py
+
+secret_finder.py
+
+import re
+import os
+import json
+from core.error_handler import ErrorHandler
+
+SECRET_PATTERNS = {
+    "aws_access_key": r"(?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])",
+    "aws_secret_key": r"(?<![A-Za-z0-9/+=])[A-Za-z0-9/+=]{40}(?![A-Za-z0-9/+=])",
+    "api_key": r"[a-f0-9]{32}|[a-f0-9]{40}|[a-f0-9]{64}",
+    "jwt_token": r"eyJ[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*",
+    "database_url": r"postgres:\/\/[^:]+:[^@]+@[^\/]+\/[^\s]+|mysql:\/\/[^:]+:[^@]+@[^\/]+\/[^\s]+"
+}
+
+def run(target, progress_callback=None):
+    """Find secrets in source code and files"""
+    results = {"secrets": []}
+    
+    # Get all collected content
+    content_files = _get_content_files(target)
+    
+    for file_path in content_files:
+        if progress_callback:
+            progress = int(100 * (len(results["secrets"]) + 1) / max(1, len(content_files)))
+            progress_callback("secret_finder", progress, f"Scanning {os.path.basename(file_path)}")
+        
+        try:
+            with open(file_path, 'r') as f:
+                content = f.read()
+                secrets = _find_secrets(content, file_path)
+                results["secrets"].extend(secrets)
+        except Exception as e:
+            ErrorHandler.log_error("secret_finder", f"Error reading {file_path}: {str(e)}", target)
+    
+    # Categorize secrets by type
+    results["categorized"] = _categorize_secrets(results["secrets"])
+    
+    return results
+
+def _get_content_files(target):
+    """Retrieve all files collected during recon"""
+    # In a real implementation, this would scan the output directory
+    return [
+        f"outputs/scans/content_{target}.json",
+        f"outputs/scans/js_{target}.json"
+    ]
+
+def _find_secrets(content, source):
+    """Find secrets in text content"""
+    secrets = []
+    
+    for secret_type, pattern in SECRET_PATTERNS.items():
+        matches = re.finditer(pattern, content)
+        for match in matches:
+            secret_value = match.group()
+            # Avoid false positives with simple checks
+            if _is_likely_secret(secret_value, secret_type):
+                secrets.append({
+                    "type": secret_type,
+                    "value": secret_value[:50] + "..." if len(secret_value) > 50 else secret_value,
+                    "source": source,
+                    "context": content[max(0, match.start()-20):min(len(content), match.end()+20)]
+                })
+    
+    return secrets
+
+def _is_likely_secret(value, secret_type):
+    """Simple validation to reduce false positives"""
+    if secret_type == "aws_access_key":
+        return value.startswith(('AKIA', 'ASIA'))
+    return True
+
+def _categorize_secrets(secrets):
+    """Categorize secrets by type and criticality"""
+    categorized = {}
+    for secret in secrets:
+        secret_type = secret["type"]
+        if secret_type not in categorized:
+            categorized[secret_type] = []
+        categorized[secret_type].append(secret)
+    
+    return categorized
+
+
+web_analyzer.py
+
+import re
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Analyze website content for important information"""
+    results = {
+        "emails": [],
+        "phones": [],
+        "names": [],
+        "technologies": [],
+        "social_links": []
+    }
+    
+    # Get home page
+    base_url = f"http://{target}"
+    
+    try:
+        if progress_callback:
+            progress_callback("web_analyzer", 20, f"Fetching {base_url}")
+        
+        response = requests.get(base_url, timeout=10)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Extract emails
+        results["emails"] = _extract_emails(response.text, target)
+        
+        # Extract phones
+        results["phones"] = _extract_phones(response.text)
+        
+        # Extract names (from author meta tags or footer)
+        results["names"] = _extract_names(soup)
+        
+        # Detect technologies
+        results["technologies"] = _detect_technologies(response.headers, soup)
+        
+        # Find social links
+        results["social_links"] = _find_social_links(soup, base_url)
+        
+    except Exception as e:
+        ErrorHandler.log_error("web_analyzer", str(e), target)
+    
+    return results
+
+def _extract_emails(content, domain):
+    """Extract emails from text content"""
+    email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+    emails = re.findall(email_pattern, content)
+    return [email for email in emails if domain in email]
+
+def _extract_phones(content):
+    """Extract phone numbers from text content"""
+    phone_pattern = r"(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}"
+    return re.findall(phone_pattern, content)
+
+def _extract_names(soup):
+    """Extract potential names from page content"""
+    # Check meta author tag
+    author_tag = soup.find('meta', attrs={'name': 'author'})
+    if author_tag and author_tag.get('content'):
+        return [author_tag['content']]
+    
+    # Check footer for names
+    names = []
+    footer = soup.find('footer')
+    if footer:
+        # Simple heuristic for names in footer
+        for item in footer.find_all('div'):
+            text = item.get_text().strip()
+            if re.match(r"^[A-Z][a-z]+ [A-Z][a-z]+$", text):
+                names.append(text)
+    
+    return names
+
+def _detect_technologies(headers, soup):
+    """Detect web technologies from headers and meta tags"""
+    tech = []
+    
+    # Server header
+    server = headers.get('Server', '')
+    if server:
+        tech.append(f"Server: {server}")
+    
+    # X-Powered-By header
+    powered_by = headers.get('X-Powered-By', '')
+    if powered_by:
+        tech.append(f"Powered By: {powered_by}")
+    
+    # Meta generator tag
+    generator_tag = soup.find('meta', attrs={'name': 'generator'})
+    if generator_tag and generator_tag.get('content'):
+        tech.append(f"Generator: {generator_tag['content']}")
+    
+    return tech
+
+def _find_social_links(soup, base_url):
+    """Find social media links on the page"""
+    social_platforms = [
+        "facebook.com", "twitter.com", "linkedin.com",
+        "instagram.com", "youtube.com", "github.com"
+    ]
+    
+    social_links = []
+    for link in soup.find_all('a', href=True):
+        href = link['href']
+        full_url = urljoin(base_url, href)
+        if any(platform in full_url for platform in social_platforms):
+            social_links.append(full_url)
+    
+    return social_links
+
+tools/subdomain_enum/
+
+__init__.py
+
+
+amass_wrapper.py
+
+
+import subprocess
+import json
+import os
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Run Amass for subdomain enumeration"""
+    output_file = f"amass_{target}.json"
+    results = {"subdomains": []}
+    
+    try:
+        if progress_callback:
+            progress_callback("amass", 10, "Starting Amass...")
+        
+        # Run Amass
+        command = f"amass enum -passive -d {target} -json {output_file}"
+        subprocess.run(command, shell=True, check=True)
+        
+        if progress_callback:
+            progress_callback("amass", 50, "Processing results...")
+        
+        # Parse results
+        if os.path.exists(output_file):
+            with open(output_file, 'r') as f:
+                for line in f:
+                    data = json.loads(line)
+                    results["subdomains"].append({
+                        "domain": data['name'],
+                        "source": "amass",
+                        "resolved": data.get('resolved', False)
+                    })
+        
+        return results
+    
+    except Exception as e:
+        ErrorHandler.log_error("amass", str(e), target)
+        raise
+
+
+sublister.py
+
+import subprocess
+import csv
+import os
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Run Sublist3r for subdomain enumeration"""
+    output_file = f"sublist3r_{target}.csv"
+    results = {"subdomains": []}
+    
+    try:
+        if progress_callback:
+            progress_callback("sublist3r", 10, "Starting Sublist3r...")
+        
+        # Run Sublist3r
+        command = f"sublist3r -d {target} -o {output_file}"
+        subprocess.run(command, shell=True, check=True)
+        
+        if progress_callback:
+            progress_callback("sublist3r", 70, "Processing results...")
+        
+        # Parse results
+        if os.path.exists(output_file):
+            with open(output_file, 'r') as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    if row:  # Skip empty rows
+                        results["subdomains"].append({
+                            "domain": row[0],
+                            "source": "sublist3r",
+                            "resolved": False
+                        })
+        
+        return results
+    
+    except Exception as e:
+        ErrorHandler.log_error("sublist3r", str(e), target)
+        raise
+
+
+assetfinder.py
+
+import subprocess
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Run Assetfinder for subdomain enumeration"""
+    results = {"subdomains": []}
+    
+    try:
+        if progress_callback:
+            progress_callback("assetfinder", 10, "Starting Assetfinder...")
+        
+        # Run Assetfinder
+        command = f"assetfinder --subs-only {target}"
+        process = subprocess.run(
+            command, 
+            shell=True, 
+            check=True, 
+            capture_output=True, 
+            text=True
+        )
+        
+        if progress_callback:
+            progress_callback("assetfinder", 70, "Processing results...")
+        
+        # Process output
+        domains = process.stdout.splitlines()
+        for domain in domains:
+            if domain.strip():
+                results["subdomains"].append({
+                    "domain": domain.strip(),
+                    "source": "assetfinder",
+                    "resolved": False
+                })
+        
+        return results
+    
+    except Exception as e:
+        ErrorHandler.log_error("assetfinder", str(e), target)
+        raise
+
+
+findomain.py
+
+import subprocess
+import os
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Run Findomain for subdomain enumeration"""
+    output_file = f"findomain_{target}.txt"
+    results = {"subdomains": []}
+    
+    try:
+        if progress_callback:
+            progress_callback("findomain", 10, "Starting Findomain...")
+        
+        # Run Findomain
+        command = f"findomain -t {target} -q -o"
+        subprocess.run(command, shell=True, check=True)
+        
+        if progress_callback:
+            progress_callback("findomain", 70, "Processing results...")
+        
+        # Parse results
+        if os.path.exists(output_file):
+            with open(output_file, 'r') as f:
+                for domain in f:
+                    results["subdomains"].append({
+                        "domain": domain.strip(),
+                        "source": "findomain",
+                        "resolved": False
+                    })
+        
+        return results
+    
+    except Exception as e:
+        ErrorHandler.log_error("findomain", str(e), target)
+        raise
+
+
+crt_sh.py
+
+import requests
+import json
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Query crt.sh for subdomains"""
+    results = {"subdomains": []}
+    try:
+        progress_callback("crt_sh", 10, "Querying certificate transparency...")
+        url = f"https://crt.sh/?q=%.{target}&output=json"
+        response = requests.get(url, timeout=15)
+        
+        if response.status_code == 200:
+            data = response.json()
+            progress_callback("crt_sh", 50, f"Processing {len(data)} certificates...")
+            
+            unique_domains = set()
+            for cert in data:
+                name_value = cert.get('name_value', '')
+                domains = name_value.split('\n')
+                for domain in domains:
+                    domain = domain.strip().lower()
+                    if domain.endswith(f".{target}") and '*' not in domain:
+                        unique_domains.add(domain)
+            
+            results["subdomains"] = [
+                {"domain": domain, "source": "crt.sh", "resolved": False}
+                for domain in unique_domains
+            ]
+            
+            progress_callback("crt_sh", 90, f"Found {len(unique_domains)} domains")
+        else:
+            raise Exception(f"API returned {response.status_code}")
+            
+    except Exception as e:
+        ErrorHandler.log_error("crt_sh", str(e), target)
+        raise
+    
+    return results
+
+
+subbrute.py
+
+import subprocess
+import os
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Run SubBrute for subdomain enumeration"""
+    output_file = f"subbrute_{target}.txt"
+    results = {"subdomains": []}
+    
+    try:
+        if progress_callback:
+            progress_callback("subbrute", 10, "Starting SubBrute...")
+        
+        # Run SubBrute
+        command = f"python3 subbrute.py {target} > {output_file}"
+        subprocess.run(command, shell=True, check=True)
+        
+        if progress_callback:
+            progress_callback("subbrute", 70, "Processing results...")
+        
+        # Parse results
+        if os.path.exists(output_file):
+            with open(output_file, 'r') as f:
+                for domain in f:
+                    results["subdomains"].append({
+                        "domain": domain.strip(),
+                        "source": "subbrute",
+                        "resolved": False
+                    })
+        
+        return results
+    
+    except Exception as e:
+        ErrorHandler.log_error("subbrute", str(e), target)
+        raise
+
+
+
+tools/vulnerability/
+
+__init__.py
+
+nuclei_wrapper.py
+
+import subprocess
+import json
+import os
+from core.error_handler import ErrorHandler
+
+def run(target, progress_callback=None):
+    """Run Nuclei for vulnerability scanning"""
+    output_file = f"nuclei_{target}.json"
+    results = {"vulnerabilities": []}
+    
+    try:
+        if progress_callback:
+            progress_callback("nuclei", 10, "Starting Nuclei...")
+        
+        # Run Nuclei
+        command = f"nuclei -u {target} -json -o {output_file}"
+        subprocess.run(command, shell=True, check=True)
+        
+        if progress_callback:
+            progress_callback("nuclei", 70, "Processing results...")
+        
+        # Parse results
+        if os.path.exists(output_file):
+            with open(output_file, 'r') as f:
+                for line in f:
+                    try:
+                        vuln = json.loads(line)
+                        results["vulnerabilities"].append({
+                            "template": vuln.get("template", ""),
+                            "severity": vuln.get("severity", "unknown"),
+                            "url": vuln.get("host", ""),
+                            "description": vuln.get("info", {}).get("description", "")
+                        })
+                    except:
+                        continue
+        
+        return results
+    
+    except Exception as e:
+        ErrorHandler.log_error("nuclei", str(e), target)
+        raise
+
+zap_api.py   
+
+# Note: This requires a running ZAP instance and API key
+import time
+import requests
+from core.error_handler import ErrorHandler
+
+ZAP_API_URL = "http://localhost:8080"
+API_KEY = "your-api-key"
+
+def run(target, progress_callback=None):
+    """Run OWASP ZAP for vulnerability scanning"""
+    results = {"vulnerabilities": []}
+    
+    try:
+        # Start ZAP scan
+        scan_url = f"{ZAP_API_URL}/JSON/ascan/action/scan/?apikey={API_KEY}&url={target}&recurse=true"
+        response = requests.get(scan_url)
+        scan_id = response.json().get("scan")
+        
+        # Monitor scan progress
+        while True:
+            status_url = f"{ZAP_API_URL}/JSON/ascan/view/status/?apikey={API_KEY}&scanId={scan_id}"
+            status_resp = requests.get(status_url)
+            status = status_resp.json().get("status")
+            
+            if progress_callback:
+                progress_callback("zap", int(status), "Scanning...")
+            
+            if status == "100":
+                break
+            time.sleep(5)
+        
+        # Retrieve results
+        alerts_url = f"{ZAP_API_URL}/JSON/core/view/alerts/?apikey={API_KEY}&baseurl={target}"
+        alerts_resp = requests.get(alerts_url)
+        alerts = alerts_resp.json().get("alerts", [])
+        
+        for alert in alerts:
+            results["vulnerabilities"].append({
+                "name": alert.get("name"),
+                "risk": alert.get("risk"),
+                "url": alert.get("url"),
+                "description": alert.get("description")
+            })
+        
+        return results
+    
+    except Exception as e:
+        ErrorHandler.log_error("zap", str(e), target)
+        raise
+
+
+    

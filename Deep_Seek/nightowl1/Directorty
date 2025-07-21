@@ -1,0 +1,83 @@
+nightowl/
+├── Dockerfile
+├── requirements.txt
+├── main.py
+├── nightowl.service
+├── README.md
+├── core/
+│    ├── ai_orchestrator.py
+│    ├── correlation_engine.py
+│    ├── asn_mapper.py
+│    ├── error_handler.py
+│    ├── fp_reducer.py
+│    ├── info_extractor.py
+│    ├── __init__.py
+│    ├── intel_utils.py
+│    ├── orchestrator.py
+│    ├── phase_workflow.py
+│    ├── report_generator.py
+│    ├── resource_manager.py
+│    ├── resource_monitor.py
+│    ├── state_manager.py
+│    ├── tool_runner.py
+│    ├── vulnerability_scanner.py
+│    └── web3_integration.py
+├── tools/
+│   ├──api_security.py
+│   ├──api_sequences.py
+│   ├──asset_discovery.py
+│   ├──cloud_scanner.py
+│   ├──content_discovery.py
+│   ├──crypto_monitor.py
+│   ├──darkweb_intel.py
+│   ├──darkweb_monitor.py
+│   ├──email_extractor.py
+│   ├──endpoint_extractor.py
+│   ├──__init__.py
+│   ├──secret_finder.py
+│   └──web_analyzer.py
+│   ├── subdomain_enum/
+│   │   ├── __init__.py
+│   │   ├── amass_wrapper.py
+│   │   ├── sublister.py
+│   │   ├── assetfinder.py
+│   │   ├── findomain.py
+│   │   ├── crt_sh.py
+│   │   └── subbrute.py
+│   └── vulnerability/
+│       ├── __init__.py
+│       ├── nuclei_wrapper.py
+│       └── zap_api.py
+├── ui/
+│   ├──dashboard.py
+│   ├──__init__.py
+│   ├──progress.py
+│   ├──theme.py
+│   ├──tool_card.py
+│   ├──visualization.py
+│   └──web_ui.py
+├── config/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── tools.yaml
+│   ├── patterns.yaml
+│   └── templates/
+│       ├── email_template.html
+│       └── report.html.j2
+├── data/
+│   ├── __init__.py
+│   └── wordlists/
+│       ├── subdomains.txt
+│       ├── directories.txt
+│       └── fuzz_params.txt
+├── tests/
+│   ├──__init__.py
+│   ├──test_error_handling.py
+│   ├──test_phase_workflow.py
+│   ├──test_report_generator.py
+│   ├──test_state_manager.py
+│   ├──test_tool_runner.py
+│   └──test_ui_components.py
+└── 
+
+    └── nightowl.tf

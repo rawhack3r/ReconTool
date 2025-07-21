@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NightOwl Report - {{ target }}</title>
+    <style>
+        :root {
+            --primary: #6A0DAD;
+            --secondary: #8E44AD;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --dark: #2C3E50;
+            --light: #ECF0F1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #7F8C8D;
+            font-size: 1rem;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .vuln-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .vuln-table th {
+            background-color: var(--dark);
+            color: white;
+            text-align: left;
+            padding: 12px 15px;
+        }
+        
+        .vuln-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .vuln-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .critical { color: var(--danger); font-weight: bold; }
+        .high { color: #E67E22; }
+        .medium { color: var(--warning); }
+        .low { color: #3498DB; }
+        .info { color: #7F8C8D; }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .critical-bg { background-color: var(--danger); color: white; }
+        .high-bg { background-color: #E67E22; color: white; }
+        .medium-bg { background-color: var(--warning); color: white; }
+        .low-bg { background-color: #3498DB; color: white; }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #7F8C8D;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>NightOwl Reconnaissance Report</h1>
+        <p>Target: {{ target }} | Mode: {{ mode }} | Date: {{ start_time[:10] }}</p>
+        <p>Duration: {{ duration }}</p>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.get('subdomains', 0) }}</div>
+            <div class="stat-label">Subdomains Found</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.get('vulnerabilities', 0) }}</div>
+            <div class="stat-label">Vulnerabilities</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.get('secrets', 0) }}</div>
+            <div class="stat-label">Secrets Found</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.get('critical_assets', 0) }}</div>
+            <div class="stat-label">Critical Assets</div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Executive Summary</h2>
+        <p>The NightOwl reconnaissance scan identified {{ stats.get('vulnerabilities', 0) }} 
+        potential vulnerabilities and {{ stats.get('secrets', 0) }} sensitive information exposures.</p>
+        
+        <h3>Top Recommendations:</h3>
+        <ol>
+            <li>Immediately investigate the critical vulnerabilities listed below</li>
+            <li>Review and rotate any exposed credentials found in secrets report</li>
+            <li>Verify all cloud assets for proper configuration</li>
+        </ol>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Critical Vulnerabilities</h2>
+        <table class="vuln-table">
+            <thead>
+                <tr>
+                    <th>Severity</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vuln in vulnerabilities.critical %}
+                <tr>
+                    <td><span class="badge critical-bg">CRITICAL</span></td>
+                    <td>{{ vuln.type }}</td>
+                    <td>{{ vuln.location }}</td>
+                    <td>{{ vuln.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Scan Details</h2>
+        <h3>Scan Information:</h3>
+        <ul>
+            <li><strong>Start Time:</strong> {{ start_time }}</li>
+            <li><strong>End Time:</strong> {{ end_time }}</li>
+            <li><strong>Duration:</strong> {{ duration }}</li>
+            <li><strong>Target Type:</strong> {{ target_type }}</li>
+        </ul>
+        
+        <h3>Next Steps:</h3>
+        <p>Refer to the manual testing checklist and detailed vulnerability reports 
+        in the output directory for further investigation.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Generated by NightOwl v{{ VERSION }} | {{ timestamp }}</p>
+    </div>
+</body>
+</html>

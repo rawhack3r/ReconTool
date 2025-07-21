@@ -1,0 +1,42 @@
+secrets:
+  aws_access_key: "(?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])"
+  aws_secret_key: "(?<![A-Za-z0-9/+=])[A-Za-z0-9/+=]{40}(?![A-Za-z0-9/+=])"
+  api_key: "[a-f0-9]{32}|[a-f0-9]{40}|[a-f0-9]{64}"
+  jwt_token: "eyJ[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*"
+  database_url: "postgres:\/\/[^:]+:[^@]+@[^\/]+\/[^\s]+|mysql:\/\/[^:]+:[^@]+@[^\/]+\/[^\s]+"
+
+important_keywords:
+  - "admin"
+  - "backup"
+  - "config"
+  - "secret"
+  - "internal"
+  - "api"
+  - "credential"
+  - "token"
+  - "key"
+  - "password"
+  - "finance"
+  - "payment"
+  - "user"
+  - "account"
+
+vulnerability_patterns:
+  sql_injection: 
+    - "select.*from"
+    - "union.*select"
+    - "insert.*into"
+    - "update.*set"
+    - "delete.*from"
+  xss:
+    - "<script>"
+    - "alert\\("
+    - "document.cookie"
+  path_traversal:
+    - "\\.\\./"
+    - "\\.\\.\\\\"
+    - "etc/passwd"
+  command_injection:
+    - ";\\s*\\b(ls|dir|cat|rm|sh|bash|cmd|powershell)\\b"
+    - "\\|\\s*\\b(ls|dir|cat|rm|sh|bash|cmd|powershell)\\b"
+    - "`\\b(ls|dir|cat|rm|sh|bash|cmd|powershell)\\b`"

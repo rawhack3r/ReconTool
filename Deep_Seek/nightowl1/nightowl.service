@@ -1,0 +1,16 @@
+[Unit]
+Description=NightOwl Reconnaissance Service
+After=network.target
+
+[Service]
+User=nightowl
+Group=nightowl
+WorkingDirectory=/opt/nightowl
+ExecStart=/usr/bin/python3 /opt/nightowl/main.py -m deep example.com
+Restart=on-failure
+RestartSec=5s
+MemoryMax=2G
+CPUQuota=70%
+
+[Install]
+WantedBy=multi-user.target

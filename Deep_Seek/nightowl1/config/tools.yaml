@@ -1,0 +1,106 @@
+scan_modes:
+  light:
+    - name: findomain
+      description: "Fast subdomain discovery"
+    - name: crt_sh
+      description: "Certificate transparency lookup"
+    - name: httpx
+      description: "HTTP service detection"
+      
+  deep:
+    - include: light
+    - name: amass
+      description: "Comprehensive subdomain discovery"
+      critical: true
+    - name: sublister
+      description: "OSINT subdomain enumeration"
+    - name: nuclei
+      description: "Vulnerability scanning"
+    - name: email_extractor
+      description: "Email address discovery"
+    - name: content_discovery
+      description: "Hidden directory scanning"
+    - name: api_security
+      description: "API security scanning"
+      
+  deeper:
+    - include: deep
+    - name: cloud_scanner
+      description: "Cloud infrastructure audit"
+      requires: cloud
+    - name: darkweb_intel
+      description: "Dark web threat intelligence"
+    - name: secret_finder
+      description: "Sensitive information detection"
+    - name: web3_resolver
+      description: "Web3 domain resolution"
+      enabled: ${ENABLE_WEB3:-false}
+    - name: full_port_scan
+      description: "Comprehensive port scanning"
+
+tools:
+  findomain:
+    command: "findomain -t {target} -q -o"
+    parser: "parse_findomain"
+    
+  crt_sh:
+    command: "python tools/subdomain_enum/crt_sh.py {target}"
+    parser: "parse_json"
+    
+  amass:
+    command: "amass enum -passive -d {target} -json {output}"
+    parser: "parse_amass"
+    
+  nuclei:
+    command: "nuclei -u {target} -t config/templates/nuclei/ -o {output}"
+    parser: "parse_nuclei"
+    
+  api_security:
+    command: "python tools/api_security.py {target}"
+    parser: "parse_json"
+    timeout: 600  # 10 minutes
+    
+  cloud_scanner:
+    command: "python tools/cloud_scanner.py {target}"
+    parser: "parse_json"
+    requires: ["amass", "nuclei"]
+    
+  darkweb_intel:
+    command: "python tools/darkweb_intel.py {target}"
+    parser: "parse_json"
+    timeout: 900  # 15 minutes
+    
+  web3_resolver:
+    command: "python core/web3_integration.py {target}"
+    parser: "parse_json"
+    enabled: ${ENABLE_WEB3:-false}
+    
+  email_extractor:
+    command: "python tools/email_extractor.py"
+    requires: ["content_discovery"]
+    
+  secret_finder:
+    command: "python tools/secret_finder.py"
+    requires: ["web_analyzer"]
+    
+  full_port_scan:
+    command: "nmap -T4 -p- -sV -oX {output} {target}"
+    parser: "parse_nmap"
+    timeout: 1800  # 30 minutes
+
+# Parsing configurations
+parsers:
+  parse_json:
+    function: "json.loads"
+    
+  parse_nuclei:
+    function: "core.tool_runner:ToolRunner._parse_nuclei_output"
+    
+  parse_amass:
+    function: "core.intel_utils:parse_amass_output"
+    
+  parse_nmap:
+    function: "core.intel_utils:parse_nmap_xml"
+    
+  parse_findomain:
+    function: "core.intel_utils:parse_findomain_output"

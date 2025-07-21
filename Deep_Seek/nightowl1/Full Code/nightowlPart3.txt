@@ -1,0 +1,1194 @@
+nightowlPart3
+
+
+ui/
+
+dashboard.py
+# ... (previous imports) ...
+from rich.layout import Layout
+from rich.panel import Panel
+from rich.live import Live
+from rich.table import Table, Column
+from rich.progress import Progress, BarColumn, TextColumn
+
+class NightOwlDashboard:
+    # ... (previous methods) ...
+    
+    def _create_layout(self):
+        self.layout = Layout()
+        
+        # Header section
+        self.layout.split(
+            Layout(name="header", size=3),
+            Layout(name="main", ratio=1)
+        )
+        
+        # Main section split
+        self.layout["main"].split_row(
+            Layout(name="work_area", ratio=3),
+            Layout(name="phase_area", ratio=1)
+        )
+        
+        # Initialize panels
+        self.header_panel = Panel("", title="System Resources", style="header")
+        self.work_panel = Panel("", title="[bold]Active Operations[/]", padding=(1, 2))
+        self.phase_panel = Panel("", title="[bold]Workflow Progress[/]", padding=(1, 2))
+        
+        # Update layout
+        self.layout["header"].update(self.header_panel)
+        self.layout["work_area"].update(self.work_panel)
+        self.layout["phase_area"].update(self.phase_panel)
+        
+    def set_current_phase(self, phase_index):
+        self.current_phase = phase_index
+        self._update_phase_display()
+        
+    def start_tool(self, tool_name, description):
+        progress = Progress(
+            TextColumn(f"[tool]{tool_name}[/]", width=20),
+            BarColumn(bar_width=40),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TextColumn("•"),
+            TextColumn("[info]{task.description}", overflow="ellipsis"),
+            expand=True
+        )
+        task_id = progress.add_task(description, total=100)
+        self.progress_bars[tool_name] = {
+            'progress': progress,
+            'task_id': task_id,
+            'start_time': time.time(),
+            'status': 'running'
+        }
+        self._update_tools_display()
+        
+    def _update_phase_display(self):
+        if not hasattr(self, 'phases'):
+            return
+            
+        table = Table(
+            Column("Phase", style="phase_header"),
+            Column("Status", style="status_header"),
+            expand=True
+        )
+        
+        for idx, phase in enumerate(self.phases):
+            status = "pending"
+            if idx < self.current_phase:
+                status = "completed"
+            elif idx == self.current_phase:
+                status = "running"
+                
+            if status == "pending":
+                icon, style = "⏳", "phase_pending"
+            elif status == "completed":
+                icon, style = "✅", "phase_completed"
+            else:
+                icon, style = "🦉", "phase_active"
+                
+            table.add_row(phase['name'], f"{icon} [bold]{status.capitalize()}[/]", style=style)
+            
+        self.phase_panel.renderable = table
+
+
+__init__.py
+
+
+progress.py
+
+from rich.progress import (
+    Progress, 
+    BarColumn, 
+    TextColumn, 
+    TimeRemainingColumn,
+    TimeElapsedColumn
+)
+
+class NightOwlProgress(Progress):
+    def __init__(self):
+        super().__init__(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(bar_width=40),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TimeRemainingColumn(),
+            TimeElapsedColumn(),
+            expand=True
+        )
+    
+    def add_tool_task(self, tool_name, description):
+        """Add a new task for tool execution"""
+        return self.add_task(
+            f"[tool]{tool_name}[/]: {description}",
+            total=100
+        )
+    
+    def update_tool_progress(self, task_id, progress, message=""):
+        """Update progress for a tool task"""
+        self.update(
+            task_id,
+            completed=progress,
+            description=f"[tool]{self.tasks[task_id].fields['description'].split(':')[0]}[/]: {message}"
+        )
+
+
+theme.py
+
+from rich.theme import Theme
+
+NIGHTOWL_THEME = Theme({
+    # UI Elements
+    "banner": "bold #6A0DAD",
+    "subtitle": "#8E44AD",
+    "header": "bold #3498DB on #2C3E50",
+    "resource_panel": "#1ABC9C",
+    
+    # Status Indicators
+    "success": "bold green",
+    "warning": "bold yellow",
+    "error": "bold red",
+    "skipped": "dim italic",
+    
+    # Workflow
+    "phase_header": "bold #F39C12",
+    "phase_active": "bold #2ECC71",
+    "phase_completed": "dim #27AE60",
+    "phase_pending": "dim #7F8C8D",
+    
+    # Tools
+    "tool_name": "bold #3498DB",
+    "description": "#BDC3C7",
+    "progress": "#1ABC9C",
+    
+    # Results
+    "count": "bold #F1C40F",
+    "vuln_critical": "bold red",
+    "vuln_high": "bold #E74C3C",
+    "vuln_medium": "bold #F39C12",
+    "vuln_low": "bold #3498DB",
+    
+    # Special
+    "important": "bold blink #FF00FF",
+    "secret": "bold #FF0000 on #FFFF00"
+})
+
+
+tool_card.py
+
+from rich.panel import Panel
+from rich.text import Text
+from rich.table import Table
+from datetime import datetime
+
+class ToolCard:
+    def __init__(self, tool_name, description):
+        self.tool_name = tool_name
+        self.description = description
+        self.start_time = datetime.now()
+        self.end_time = None
+        self.progress = 0
+        self.status = "pending"  # pending, running, completed, error
+        self.result = None
+        self.error = None
+    
+    def start(self):
+        self.status = "running"
+        self.start_time = datetime.now()
+    
+    def update(self, progress, message=""):
+        self.progress = progress
+        self.message = message
+    
+    def complete(self, result):
+        self.status = "completed"
+        self.end_time = datetime.now()
+        self.result = result
+        self.progress = 100
+    
+    def error(self, error_message):
+        self.status = "error"
+        self.end_time = datetime.now()
+        self.error = error_message
+        self.progress = 100
+    
+    def render(self):
+        """Render the tool card as a Rich Panel"""
+        status_colors = {
+            "pending": "dim",
+            "running": "bold yellow",
+            "completed": "bold green",
+            "error": "bold red"
+        }
+        
+        title = Text.assemble(
+            ("🛠️  ", "bold"),
+            (self.tool_name, "bold cyan"),
+            f" - {self.description}",
+            style=status_colors[self.status]
+        )
+        
+        content = []
+        
+        # Status and timing
+        if self.status == "running":
+            content.append(f"⏱️ Started: {self.start_time.strftime('%H:%M:%S')}")
+            content.append(f"📈 Progress: {self.progress}%")
+            if hasattr(self, 'message'):
+                content.append(f"💬 {self.message}")
+        elif self.status == "completed":
+            duration = (self.end_time - self.start_time).total_seconds()
+            content.append(f"✅ Completed in {duration:.2f}s")
+            if self.result:
+                content.append(self._format_result())
+        elif self.status == "error":
+            content.append(f"❌ Failed: {self.error}")
+        
+        # Result summary
+        if self.result and self.status == "completed":
+            content.append("")
+            content.append("[bold]Results:[/]")
+            content.append(self._format_result())
+        
+        return Panel(
+            "\n".join(content),
+            title=title,
+            border_style=status_colors[self.status]
+        )
+    
+    def _format_result(self):
+        """Format result summary based on tool type"""
+        if "subdomains" in self.result:
+            count = len(self.result["subdomains"])
+            return f"🌐 Found {count} subdomains"
+        elif "vulnerabilities" in self.result:
+            count = len(self.result["vulnerabilities"])
+            return f"⚠️ Found {count} vulnerabilities"
+        elif "secrets" in self.result:
+            count = len(self.result["secrets"])
+            return f"🔑 Found {count} secrets"
+        return "Task completed successfully"
+
+
+visualization.py
+
+import plotly.graph_objects as go
+from networkx.drawing.nx_agraph import graphviz_layout
+
+def create_3d_graph(correlation_graph):
+    pos = graphviz_layout(correlation_graph, prog='neato', dim=3)
+    
+    edge_x, edge_y, edge_z = [], [], []
+    for edge in correlation_graph.edges():
+        x0, y0, z0 = pos[edge[0]]
+        x1, y1, z1 = pos[edge[1]]
+        edge_x.extend([x0, x1, None])
+        edge_y.extend([y0, y1, None])
+        edge_z.extend([z0, z1, None])
+    
+    node_x, node_y, node_z = [], [], []
+    for node in correlation_graph.nodes():
+        x, y, z = pos[node]
+        node_x.append(x)
+        node_y.append(y)
+        node_z.append(z)
+    
+    fig = go.Figure(
+        data=[
+            go.Scatter3d(x=edge_x, y=edge_y, z=edge_z, mode='lines', line=dict(width=0.5, color='#888')),
+            go.Scatter3d(x=node_x, y=node_y, z=node_z, mode='markers', marker=dict(
+                size=5,
+                color=[correlation_graph.nodes[n].get('risk', 0) for n in correlation_graph.nodes()],
+                colorscale='Hot',
+                opacity=0.8
+            ))
+        ],
+        layout=go.Layout(
+            scene=dict(aspectmode="cube"),
+            margin=dict(t=0, b=0, l=0, r=0)
+        )
+    )
+    return fig
+
+
+web_ui.py
+
+import os
+import threading
+from flask import Flask, render_template, jsonify, send_from_directory
+from core.orchestrator import NightOwlOrchestrator
+
+app = Flask(__name__, static_folder='static', template_folder='templates')
+orchestrator = None
+dashboard_data = {
+    "status": "idle",
+    "progress": 0,
+    "current_phase": 0,
+    "phases": [],
+    "tools": {},
+    "resources": {
+        "cpu": 0,
+        "memory": 0,
+        "network": "0KB/s ▼ | 0KB/s ▲"
+    }
+}
+
+def start_web_interface(orchestrator_instance):
+    global orchestrator
+    orchestrator = orchestrator_instance
+    
+    # Start the orchestrator in a separate thread
+    threading.Thread(target=run_scan, daemon=True).start()
+    
+    app.run(host='0.0.0.0', port=5000, debug=False)
+
+def run_scan():
+    global dashboard_data
+    try:
+        dashboard_data["status"] = "running"
+        orchestrator.execute_workflow()
+        dashboard_data["status"] = "completed"
+    except Exception as e:
+        dashboard_data["status"] = f"error: {str(e)}"
+
+@app.route('/')
+def index():
+    return render_template('dashboard.html')
+
+@app.route('/status')
+def status():
+    return jsonify(dashboard_data)
+
+@app.route('/reports/<path:filename>')
+def download_report(filename):
+    return send_from_directory('outputs/reports', filename)
+
+@app.route('/start')
+def start_scan():
+    if orchestrator and dashboard_data['status'] == 'idle':
+        threading.Thread(target=run_scan).start()
+        return jsonify({"status": "started"})
+    return jsonify({"status": "already running"})
+
+@app.route('/pause')
+def pause_scan():
+    # Implement pause functionality
+    return jsonify({"status": "paused"})
+
+@app.route('/resume')
+def resume_scan():
+    # Implement resume functionality
+    return jsonify({"status": "resumed"})
+
+@app.route('/stop')
+def stop_scan():
+    # Implement stop functionality
+    return jsonify({"status": "stopped"})
+
+
+
+
+
+config/
+
+__init__.py
+
+settings.py
+
+# NightOwl Configuration Settings
+
+VERSION = "1.0.0"
+AUTHOR = "n00bhack3r"
+CONTACT = "n00bhack3r@example.com"
+
+# Scan modes
+SCAN_MODES = ["light", "deep", "deeper", "custom"]
+
+# Performance Settings
+MAX_CONCURRENT_TOOLS = 3
+MAX_MEMORY_USAGE = 2048  # MB
+MAX_CPU_USAGE = 70  # %
+
+# Path Settings
+WORDLIST_DIR = "config/wordlists"
+REPORT_DIR = "outputs/reports"
+SCAN_OUTPUT_DIR = "outputs/scans"
+STATE_FILE = ".nightowl_state"
+
+# UI Settings
+UI_REFRESH_RATE = 0.5  # seconds
+COLOR_THEME = "dark"  # dark | light | blue
+
+# Notification Settings (optional)
+SLACK_WEBHOOK = ""
+EMAIL_NOTIFICATIONS = False
+EMAIL_RECEIVER = ""
+
+# Feature Toggles
+ENABLE_WEB3 = False
+ENABLE_DARKWEB = False
+ENABLE_CLOUD_SCAN = True
+
+
+tools.yaml
+
+scan_modes:
+  light:
+    - name: findomain
+      description: "Fast subdomain discovery"
+    - name: crt_sh
+      description: "Certificate transparency lookup"
+    - name: httpx
+      description: "HTTP service detection"
+      
+  deep:
+    - include: light
+    - name: amass
+      description: "Comprehensive subdomain discovery"
+      critical: true
+    - name: sublister
+      description: "OSINT subdomain enumeration"
+    - name: nuclei
+      description: "Vulnerability scanning"
+    - name: email_extractor
+      description: "Email address discovery"
+    - name: content_discovery
+      description: "Hidden directory scanning"
+    - name: api_security
+      description: "API security scanning"
+      
+  deeper:
+    - include: deep
+    - name: cloud_scanner
+      description: "Cloud infrastructure audit"
+      requires: cloud
+    - name: darkweb_intel
+      description: "Dark web threat intelligence"
+    - name: secret_finder
+      description: "Sensitive information detection"
+    - name: web3_resolver
+      description: "Web3 domain resolution"
+      enabled: ${ENABLE_WEB3:-false}
+    - name: full_port_scan
+      description: "Comprehensive port scanning"
+
+tools:
+  findomain:
+    command: "findomain -t {target} -q -o"
+    parser: "parse_findomain"
+    
+  crt_sh:
+    command: "python tools/subdomain_enum/crt_sh.py {target}"
+    parser: "parse_json"
+    
+  amass:
+    command: "amass enum -passive -d {target} -json {output}"
+    parser: "parse_amass"
+    
+  nuclei:
+    command: "nuclei -u {target} -t config/templates/nuclei/ -o {output}"
+    parser: "parse_nuclei"
+    
+  api_security:
+    command: "python tools/api_security.py {target}"
+    parser: "parse_json"
+    timeout: 600  # 10 minutes
+    
+  cloud_scanner:
+    command: "python tools/cloud_scanner.py {target}"
+    parser: "parse_json"
+    requires: ["amass", "nuclei"]
+    
+  darkweb_intel:
+    command: "python tools/darkweb_intel.py {target}"
+    parser: "parse_json"
+    timeout: 900  # 15 minutes
+    
+  web3_resolver:
+    command: "python core/web3_integration.py {target}"
+    parser: "parse_json"
+    enabled: ${ENABLE_WEB3:-false}
+    
+  email_extractor:
+    command: "python tools/email_extractor.py"
+    requires: ["content_discovery"]
+    
+  secret_finder:
+    command: "python tools/secret_finder.py"
+    requires: ["web_analyzer"]
+    
+  full_port_scan:
+    command: "nmap -T4 -p- -sV -oX {output} {target}"
+    parser: "parse_nmap"
+    timeout: 1800  # 30 minutes
+
+# Parsing configurations
+parsers:
+  parse_json:
+    function: "json.loads"
+    
+  parse_nuclei:
+    function: "core.tool_runner:ToolRunner._parse_nuclei_output"
+    
+  parse_amass:
+    function: "core.intel_utils:parse_amass_output"
+    
+  parse_nmap:
+    function: "core.intel_utils:parse_nmap_xml"
+    
+  parse_findomain:
+    function: "core.intel_utils:parse_findomain_output"
+
+
+patterns.yaml
+
+secrets:
+  aws_access_key: "(?<![A-Z0-9])[A-Z0-9]{20}(?![A-Z0-9])"
+  aws_secret_key: "(?<![A-Za-z0-9/+=])[A-Za-z0-9/+=]{40}(?![A-Za-z0-9/+=])"
+  api_key: "[a-f0-9]{32}|[a-f0-9]{40}|[a-f0-9]{64}"
+  jwt_token: "eyJ[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*"
+  database_url: "postgres:\/\/[^:]+:[^@]+@[^\/]+\/[^\s]+|mysql:\/\/[^:]+:[^@]+@[^\/]+\/[^\s]+"
+
+important_keywords:
+  - "admin"
+  - "backup"
+  - "config"
+  - "secret"
+  - "internal"
+  - "api"
+  - "credential"
+  - "token"
+  - "key"
+  - "password"
+  - "finance"
+  - "payment"
+  - "user"
+  - "account"
+
+vulnerability_patterns:
+  sql_injection: 
+    - "select.*from"
+    - "union.*select"
+    - "insert.*into"
+    - "update.*set"
+    - "delete.*from"
+  xss:
+    - "<script>"
+    - "alert\\("
+    - "document.cookie"
+  path_traversal:
+    - "\\.\\./"
+    - "\\.\\.\\\\"
+    - "etc/passwd"
+  command_injection:
+    - ";\\s*\\b(ls|dir|cat|rm|sh|bash|cmd|powershell)\\b"
+    - "\\|\\s*\\b(ls|dir|cat|rm|sh|bash|cmd|powershell)\\b"
+    - "`\\b(ls|dir|cat|rm|sh|bash|cmd|powershell)\\b`"
+
+config/templates/
+
+report.html.j2
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NightOwl Report - {{ target }}</title>
+    <style>
+        :root {
+            --primary: #6A0DAD;
+            --secondary: #8E44AD;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --dark: #2C3E50;
+            --light: #ECF0F1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #7F8C8D;
+            font-size: 1rem;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .vuln-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .vuln-table th {
+            background-color: var(--dark);
+            color: white;
+            text-align: left;
+            padding: 12px 15px;
+        }
+        
+        .vuln-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .vuln-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .critical { color: var(--danger); font-weight: bold; }
+        .high { color: #E67E22; }
+        .medium { color: var(--warning); }
+        .low { color: #3498DB; }
+        .info { color: #7F8C8D; }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .critical-bg { background-color: var(--danger); color: white; }
+        .high-bg { background-color: #E67E22; color: white; }
+        .medium-bg { background-color: var(--warning); color: white; }
+        .low-bg { background-color: #3498DB; color: white; }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #7F8C8D;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>NightOwl Reconnaissance Report</h1>
+        <p>Target: {{ target }} | Mode: {{ mode }} | Date: {{ start_time[:10] }}</p>
+        <p>Duration: {{ duration }}</p>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.get('subdomains', 0) }}</div>
+            <div class="stat-label">Subdomains Found</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.get('vulnerabilities', 0) }}</div>
+            <div class="stat-label">Vulnerabilities</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.get('secrets', 0) }}</div>
+            <div class="stat-label">Secrets Found</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.get('critical_assets', 0) }}</div>
+            <div class="stat-label">Critical Assets</div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Executive Summary</h2>
+        <p>The NightOwl reconnaissance scan identified {{ stats.get('vulnerabilities', 0) }} 
+        potential vulnerabilities and {{ stats.get('secrets', 0) }} sensitive information exposures.</p>
+        
+        <h3>Top Recommendations:</h3>
+        <ol>
+            <li>Immediately investigate the critical vulnerabilities listed below</li>
+            <li>Review and rotate any exposed credentials found in secrets report</li>
+            <li>Verify all cloud assets for proper configuration</li>
+        </ol>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Critical Vulnerabilities</h2>
+        <table class="vuln-table">
+            <thead>
+                <tr>
+                    <th>Severity</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vuln in vulnerabilities.critical %}
+                <tr>
+                    <td><span class="badge critical-bg">CRITICAL</span></td>
+                    <td>{{ vuln.type }}</td>
+                    <td>{{ vuln.location }}</td>
+                    <td>{{ vuln.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Scan Details</h2>
+        <h3>Scan Information:</h3>
+        <ul>
+            <li><strong>Start Time:</strong> {{ start_time }}</li>
+            <li><strong>End Time:</strong> {{ end_time }}</li>
+            <li><strong>Duration:</strong> {{ duration }}</li>
+            <li><strong>Target Type:</strong> {{ target_type }}</li>
+        </ul>
+        
+        <h3>Next Steps:</h3>
+        <p>Refer to the manual testing checklist and detailed vulnerability reports 
+        in the output directory for further investigation.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Generated by NightOwl v{{ VERSION }} | {{ timestamp }}</p>
+    </div>
+</body>
+</html>
+
+email_template.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NightOwl Security Alert</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; }
+        .header { background-color: #2c3e50; color: white; padding: 10px; text-align: center; }
+        .content { padding: 20px; }
+        .footer { text-align: center; font-size: 0.8em; color: #777; margin-top: 20px; }
+        .critical { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦉 NightOwl Security Alert</h1>
+        </div>
+        
+        <div class="content">
+            <p>Hello Security Team,</p>
+            
+            <p>NightOwl has completed a security scan for <strong>{{ target }}</strong> 
+            and found important results that require your attention:</p>
+            
+            <h2>Scan Summary</h2>
+            <ul>
+                <li>Scan Mode: {{ mode }}</li>
+                <li>Start Time: {{ start_time }}</li>
+                <li>Duration: {{ duration }}</li>
+                <li>Critical Findings: {{ critical_count }}</li>
+            </ul>
+            
+            <h2>Top Critical Findings</h2>
+            <ul>
+                {% for finding in critical_findings %}
+                <li class="critical">{{ finding.description }}</li>
+                {% endfor %}
+            </ul>
+            
+            <p><a href="{{ report_url }}">View Full Report</a></p>
+            
+            <p>Please review these findings promptly and take appropriate action.</p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message from NightOwl Reconnaissance Suite.</p>
+            <p>Do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+data/
+
+__init__.py
+
+data/wordlists/
+
+directories.txt
+
+admin
+backup
+config
+secret
+internal
+api
+test
+dev
+staging
+prod
+uploads
+assets
+images
+js
+css
+login
+logout
+register
+
+fuzz_params.txt
+
+id
+user
+name
+file
+path
+url
+redirect
+email
+phone
+token
+key
+secret
+
+subdomains.txt
+
+www
+mail
+ftp
+admin
+webmail
+server
+ns1
+ns2
+smtp
+secure
+vpn
+test
+portal
+api
+dev
+staging
+prod
+app
+blog
+shop
+store
+crm
+
+tests/
+
+__init__.py
+
+
+test_error_handling.py
+
+import unittest
+import os
+import logging
+from core.error_handler import ErrorHandler
+
+class TestErrorHandler(unittest.TestCase):
+    def setUp(self):
+        # Clear existing log file
+        self.log_file = "logs/test_errors.log"
+        if os.path.exists(self.log_file):
+            os.remove(self.log_file)
+        
+        # Initialize error handler with test log
+        self.handler = ErrorHandler()
+        logging.basicConfig(
+            filename=self.log_file,
+            level=logging.ERROR,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        self.logger = logging.getLogger("TestErrorHandler")
+    
+    def test_error_logging(self):
+        """Test that errors are properly logged"""
+        error_data = self.handler.capture_error("TestTool", "Test error message", "example.com")
+        
+        # Verify captured error data
+        self.assertEqual(error_data["tool"], "TestTool")
+        self.assertEqual(error_data["message"], "Test error message")
+        self.assertEqual(error_data["target"], "example.com")
+        
+        # Verify log file was created
+        self.assertTrue(os.path.exists(self.log_file))
+        
+        # Verify log content
+        with open(self.log_file, "r") as f:
+            log_content = f.read()
+            self.assertIn("TestTool", log_content)
+            self.assertIn("Test error message", log_content)
+            self.assertIn("example.com", log_content)
+    
+    def test_critical_error(self):
+        """Test critical error logging"""
+        self.handler.log_critical("System failure", "critical-test.com")
+        
+        with open(self.log_file, "r") as f:
+            log_content = f.read()
+            self.assertIn("CRITICAL", log_content)
+            self.assertIn("System failure", log_content)
+            self.assertIn("[SYSTEM]", log_content)
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+test_phase_workflow.py
+
+import unittest
+from core.phase_workflow import get_workflow
+
+class TestPhaseWorkflow(unittest.TestCase):
+    def test_workflow_loading(self):
+        light_workflow = get_workflow("light")
+        self.assertTrue(len(light_workflow) > 0)
+        self.assertEqual(light_workflow[0]['name'], "Subdomain Discovery")
+        
+    def test_custom_workflow(self):
+        custom_tools = ["amass", "nuclei"]
+        workflow = get_workflow("custom", custom_tools)
+        self.assertEqual(len(workflow), 2)
+        self.assertEqual(workflow[0]['name'], "amass")
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+test_report_generator.py
+
+import unittest
+import os
+import json
+from core.report_generator import generate_html_report
+
+class TestReportGenerator(unittest.TestCase):
+    def setUp(self):
+        self.report_data = {
+            "target": "test.com",
+            "mode": "light",
+            "stats": {"subdomains": 42}
+        }
+        
+    def test_report_generation(self):
+        report_path = generate_html_report(self.report_data, "test_report")
+        self.assertTrue(os.path.exists(report_path))
+        os.remove(report_path)
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+test_state_manager.py
+
+import unittest
+import os
+from core.state_manager import save_state, load_state, clear_state
+
+class TestStateManager(unittest.TestCase):
+    def setUp(self):
+        self.test_state = {"target": "example.com", "phase": 2}
+        self.state_file = ".test_state"
+        
+    def test_save_load_state(self):
+        save_state(self.test_state, filename=self.state_file)
+        loaded = load_state(filename=self.state_file)
+        self.assertEqual(self.test_state, loaded)
+        
+    def test_clear_state(self):
+        save_state(self.test_state, filename=self.state_file)
+        clear_state(filename=self.state_file)
+        self.assertFalse(os.path.exists(self.state_file))
+        
+    def tearDown(self):
+        if os.path.exists(self.state_file):
+            os.remove(self.state_file)
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+test_tool_runner.py
+
+import unittest
+from unittest.mock import patch, MagicMock
+from core.tool_runner import ToolRunner
+from core.error_handler import ErrorHandler
+
+class TestToolRunner(unittest.TestCase):
+    def setUp(self):
+        self.runner = ToolRunner()
+        ErrorHandler.log_error = MagicMock()  # Mock error logging
+    
+    @patch('subprocess.run')
+    def test_command_tool_success(self, mock_run):
+        """Test successful command execution"""
+        # Configure mock response
+        mock_result = MagicMock()
+        mock_result.stdout = '{"result": "success"}'
+        mock_result.returncode = 0
+        mock_run.return_value = mock_result
+        
+        # Run the tool
+        result = self.runner.run("test_tool", "example.com", "light")
+        
+        # Verify results
+        self.assertEqual(result, {"result": "success"})
+        mock_run.assert_called_once()
+        ErrorHandler.log_error.assert_not_called()
+    
+    @patch('subprocess.run')
+    def test_command_tool_failure(self, mock_run):
+        """Test tool failure handling"""
+        # Configure mock to raise exception
+        mock_run.side_effect = Exception("Command failed")
+        
+        # Run the tool and expect exception
+        with self.assertRaises(RuntimeError):
+            self.runner.run("failing_tool", "example.com", "light")
+        
+        # Verify error was logged
+        ErrorHandler.log_error.assert_called_with(
+            "failing_tool", "Command failed: ", "example.com"
+        )
+    
+    @patch('importlib.import_module')
+    def test_python_tool_execution(self, mock_import):
+        """Test Python-based tool execution"""
+        # Mock the module and run function
+        mock_module = MagicMock()
+        mock_module.run.return_value = {"data": "test"}
+        mock_import.return_value = mock_module
+        
+        # Run the tool
+        result = self.runner.run("python_test_tool", "example.com", "light")
+        
+        # Verify results
+        self.assertEqual(result, {"data": "test"})
+        mock_import.assert_called_with("tools.test_tool")
+        mock_module.run.assert_called_once()
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+test_ui_components.py
+
+import unittest
+from ui.tool_card import ToolCard
+from rich.console import Console
+
+class TestToolCard(unittest.TestCase):
+    def test_tool_card_lifecycle(self):
+        """Test tool card states and rendering"""
+        console = Console()
+        
+        # Create and start tool
+        card = ToolCard("TestTool", "Test description")
+        card.start()
+        render_start = card.render()
+        self.assertIn("TestTool", str(render_start))
+        self.assertIn("running", str(render_start).lower())
+        
+        # Update progress
+        card.update(50, "Processing data")
+        render_progress = card.render()
+        self.assertIn("50%", str(render_progress))
+        self.assertIn("Processing data", str(render_progress))
+        
+        # Complete successfully
+        card.complete({"result": "Successful scan"})
+        render_complete = card.render()
+        self.assertIn("Completed", str(render_complete))
+        self.assertIn("Successful", str(render_complete))
+        
+        # Simulate error
+        card.error("Scan failed")
+        render_error = card.render()
+        self.assertIn("Failed", str(render_error))
+        self.assertIn("Scan failed", str(render_error))
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+terraform/
+
+
+nightowl.tf
+
+# Terraform configuration for NightOwl deployment
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_instance" "nightowl_scanner" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.medium"
+  
+  tags = {
+    Name = "NightOwl-Recon-Scanner"
+  }
+  
+  user_data = <<-EOF
+              #!/bin/bash
+              git clone https://github.com/n00bhack3r/nightowl.git
+              cd nightowl
+              pip install -r requirements.txt
+              EOF
+}
+
+
+

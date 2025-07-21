@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NightOwl Security Alert</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; }
+        .header { background-color: #2c3e50; color: white; padding: 10px; text-align: center; }
+        .content { padding: 20px; }
+        .footer { text-align: center; font-size: 0.8em; color: #777; margin-top: 20px; }
+        .critical { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦉 NightOwl Security Alert</h1>
+        </div>
+        
+        <div class="content">
+            <p>Hello Security Team,</p>
+            
+            <p>NightOwl has completed a security scan for <strong>{{ target }}</strong> 
+            and found important results that require your attention:</p>
+            
+            <h2>Scan Summary</h2>
+            <ul>
+                <li>Scan Mode: {{ mode }}</li>
+                <li>Start Time: {{ start_time }}</li>
+                <li>Duration: {{ duration }}</li>
+                <li>Critical Findings: {{ critical_count }}</li>
+            </ul>
+            
+            <h2>Top Critical Findings</h2>
+            <ul>
+                {% for finding in critical_findings %}
+                <li class="critical">{{ finding.description }}</li>
+                {% endfor %}
+            </ul>
+            
+            <p><a href="{{ report_url }}">View Full Report</a></p>
+            
+            <p>Please review these findings promptly and take appropriate action.</p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message from NightOwl Reconnaissance Suite.</p>
+            <p>Do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>
