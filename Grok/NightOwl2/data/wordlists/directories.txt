@@ -1,0 +1,8 @@
+admin
+api
+login
+dashboard
+secure
+test
+dev
+staging

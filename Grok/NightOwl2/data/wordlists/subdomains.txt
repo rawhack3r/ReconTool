@@ -1,0 +1,12 @@
+api
+admin
+dev
+test
+staging
+internal
+login
+dashboard
+secure
+app
+web
+mail

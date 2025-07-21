@@ -1,0 +1,57 @@
+general:
+  output_dir: output
+  wordlist_dir: data/wordlists
+  resolver_file: data/wordlists/resolvers.txt
+tools:
+  amass:
+    api_key: ""
+    enabled: true
+  hunter_io:
+    api_key: ""
+    enabled: false
+  sublist3r:
+    enabled: true
+  findomain:
+    enabled: true
+  subfinder:
+    enabled: true
+  assetfinder:
+    enabled: true
+  dnsx:
+    enabled: true
+  gotator:
+    enabled: true
+  puredns:
+    enabled: true
+  trufflehog:
+    enabled: true
+  gitleaks:
+    enabled: false
+  katana:
+    enabled: true
+  ffuf:
+    wordlist: data/wordlists/directories.txt
+    enabled: true
+  waybackurls:
+    enabled: true
+  nuclei:
+    template_dir: data/nuclei_templates
+    enabled: true
+  subjack:
+    enabled: true
+  whois:
+    enabled: false
+  cloud_scanner:
+    enabled: false
+  hakip2host:
+    enabled: false
+  zap:
+    enabled: false
+  crt_sh:
+    enabled: false
+  subbrute:
+    enabled: false
+  github_scanner:
+    enabled: false
+  jsa:
+    enabled: false

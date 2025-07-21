@@ -1,0 +1,109 @@
+{
+    "tools": {
+        "subfinder": {
+            "command": "subfinder -d {target} -o {output_dir}/subdomains/subfinder.txt",
+            "default": true,
+            "deep": true
+        },
+        "amass_passive": {
+            "command": "amass enum -passive -d {target} -o {output_dir}/subdomains/amass.txt",
+            "default": true,
+            "deep": true
+        },
+        "assetfinder": {
+            "command": "assetfinder --subs-only {target} > {output_dir}/subdomains/assetfinder.txt",
+            "default": true,
+            "deep": true
+        },
+        "findomain": {
+            "command": "findomain -t {target} -u {output_dir}/subdomains/findomain.txt",
+            "default": true,
+            "deep": true
+        },
+        "crtsh": {
+            "command": "curl -s 'https://crt.sh/?q=%25.{target}&output=json' | jq -r '.[].name_value' | grep -v '^ *$' | sort -u > {output_dir}/subdomains/crtsh.txt",
+            "default": true,
+            "deep": true
+        },
+        "sublist3r": {
+            "command": "sublist3r -d {target} -o {output_dir}/subdomains/sublist3r.txt",
+            "default": true,
+            "deep": true
+        },
+        "waybackurls": {
+            "command": "waybackurls {target} > {output_dir}/subdomains/waybackurls.txt",
+            "default": true,
+            "deep": true
+        },
+        "dnsdumpster": {
+            "command": "python3 dnsdumpster.py {target} > {output_dir}/subdomains/dnsdumpster.txt",
+            "default": true,
+            "deep": true
+        },
+        "github-dork": {
+            "command": "echo 'GitHub recon handled in script' > {output_dir}/github/results.txt",
+            "default": true,
+            "deep": true
+        },
+        "amass_active": {
+            "command": "amass enum -active -d {target} -o {output_dir}/subdomains/amass_active.txt",
+            "default": false,
+            "deep": true
+        },
+        "ffuf_subdomains": {
+            "command": "ffuf -w wordlists/subdomains-top1million-5000.txt -u http://FUZZ.{target} -o {output_dir}/subdomains/ffuf.json",
+            "default": false,
+            "deep": true
+        },
+        "dnsx": {
+            "command": "dnsx -l {output_dir}/subdomains/all_subdomains.txt -resp-only -o {output_dir}/subdomains/validated_subdomains.txt",
+            "default": true,
+            "deep": true
+        },
+        "httprobe": {
+            "command": "cat {output_dir}/subdomains/validated_subdomains.txt | httprobe -prefer-https > {output_dir}/subdomains/web_subdomains.txt",
+            "default": true,
+            "deep": true
+        },
+        "naabu": {
+            "command": "naabu -l {output_dir}/subdomains/validated_subdomains.txt -o {output_dir}/ports/ports.txt {extra_args}",
+            "default": "-top-ports 1000",
+            "deep": ""
+        },
+        "nmap": {
+            "command": "nmap -sV -p {port} {host} -oN {output_dir}/services/nmap_{host}.txt",
+            "default": true,
+            "deep": true
+        },
+        "ffuf_content": {
+            "command": "ffuf -w {wordlist} -u http://{subdomain}/FUZZ -o {subdomain_dir}/ffuf.json",
+            "default": "wordlists/raft-medium-directories.txt",
+            "deep": "wordlists/raft-large-directories.txt"
+        },
+        "paramspider": {
+            "command": "paramspider -d {subdomain} -o {subdomain_dir}/paramspider.txt",
+            "default": false,
+            "deep": true
+        },
+        "nuclei": {
+            "command": "nuclei -u {subdomain} -t {templates} -o {subdomain_dir}/nuclei.txt",
+            "default": "/home/nightowl/Test/Grok/recon-tool/templates/critical",
+            "deep": "/home/nightowl/Test/Grok/recon-tool/templates"
+        },
+        "theharvester": {
+            "command": "theHarvester -d {target} -b {sources} -f {output_dir}/osint/theharvester.xml",
+            "default": "google,bing",
+            "deep": "all"
+        },
+        "metagoofil": {
+            "command": "metagoofil -d {target} -t pdf,doc,xls,ppt -o {output_dir}/osint/metagoofil",
+            "default": false,
+            "deep": true
+        },
+        "gowitness": {
+            "command": "gowitness file -f {input_file} --screenshot-path {output_dir}/screenshots",
+            "default": "{output_dir}/subdomains/web_subdomains_top.txt",
+            "deep": "{output_dir}/subdomains/web_subdomains.txt"
+        }
+    }
+}

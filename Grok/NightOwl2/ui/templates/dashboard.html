@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NightOwl Dashboard</title>
+    <link rel="stylesheet" href="/static/css/report.css">
+    <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+    <h1>NightOwl Dashboard</h1>
+    <h2>Target: {{ state.target }}</h2>
+    <h3>Mode: {{ state.mode }}</h3>
+    <h3>Workflow Progress</h3>
+    <table>
+        <tr>
+            <th>Phase</th>
+            <th>Progress</th>
+        </tr>
+        {% for phase, progress in phases.items() %}
+        <tr>
+            <td>{{ phase }}</td>
+            <td>{{ progress }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

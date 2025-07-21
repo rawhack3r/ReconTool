@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NightOwl Report - {{ target }}</title>
+    <link rel="stylesheet" href="/static/css/report.css">
+    <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+    <h1>NightOwl Report for {{ target }}</h1>
+    <h2>Subdomains ({{ subdomains|length }})</h2>
+    <table>
+        <tr><th>Subdomain</th></tr>
+        {% for subdomain in subdomains %}
+        <tr><td>{{ subdomain }}</td></tr>
+        {% endfor %}
+    </table>
+    <h2>Alive Subdomains ({{ alive|length }})</h2>
+    <table>
+        <tr><th>Subdomain</th></tr>
+        {% for subdomain in alive %}
+        <tr><td>{{ subdomain }}</td></tr>
+        {% endfor %}
+    </table>
+    <h2>Important Subdomains ({{ important|length }})</h2>
+    <table>
+        <tr><th>Subdomain</th></tr>
+        {% for subdomain in important %}
+        <tr><td>{{ subdomain }}</td></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

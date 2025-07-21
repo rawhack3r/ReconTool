@@ -1,0 +1,1 @@
+sensitive_path: "api|admin|dev|test|staging|internal|login|dashboard|secure"
